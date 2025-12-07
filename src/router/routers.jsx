@@ -1,21 +1,42 @@
-import Layout from "../layout/Layout";
-import Home from "../features/Home/Home";
+import ProtectedRoute from "../components/ProtectedRoute";
+import PublicRoute from "../components/PublicRoute";
+import SignIn from "../features/Auth/SignIn/SignIn";
 import SignUp from "../features/Auth/SignUp/SignUp";
+import DashBoard from "../features/DashBoard/DashBoard";
+import Layout from "../layout/Layout";
+
 const routers = [
     {
-        path: '/',
-        element: <Layout/>,
+        element: <PublicRoute />, 
         children: [
             {
-                index: true,
-                element: <Home/>
-            }, 
+                path: '/signin',
+                element: <SignIn />
+            },
             {
-                path: "signup",
-                element: <SignUp/>
+                path: '/signup',
+                element: <SignUp />
             }
         ]
-    }
-]
+    },
 
-export default routers
+    {
+        path: '/',
+        element: <ProtectedRoute />, 
+        children: [
+            {
+                element: <Layout />, 
+                children: [
+                    {
+                        index: true, 
+                        element: <DashBoard />
+                    }
+                ]
+            }
+        ]
+    },
+
+   
+];
+
+export default routers;
