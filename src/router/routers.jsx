@@ -30,6 +30,10 @@ const routers = [
                     {
                         index: true, 
                         element: <DashBoard />
+                    },
+                    {
+                        path: "dashboard",
+                        element: <DashBoard/>
                     }
                 ]
             }
