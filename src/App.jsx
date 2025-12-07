@@ -1,5 +1,5 @@
 import { useRoutes } from "react-router-dom"
-import routers from "./route/routes"
+import routers from "./router/routers"
 
 function App() {
   const element = useRoutes(routers)

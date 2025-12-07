@@ -10,7 +10,8 @@ const routers = [
                 element: <Home/>
             }, 
             {
-                path: ""
+                path: "dashboard",
+                element: <Dashboard/>
             }
         ]
     }

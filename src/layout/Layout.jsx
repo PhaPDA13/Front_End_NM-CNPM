@@ -6,7 +6,6 @@ import Nav from "./Nav";
 export default function Layout(){
     return (
         <>
-            <Header/>
             <div className="flex">
                 <div>
                     <Nav/>
