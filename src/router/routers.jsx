@@ -1,5 +1,6 @@
 import Layout from "../layout/Layout";
-import Home from "../pages/Home";
+import Home from "../features/Home/Home";
+import SignUp from "../features/Auth/SignUp/SignUp";
 const routers = [
     {
         path: '/',
@@ -10,8 +11,8 @@ const routers = [
                 element: <Home/>
             }, 
             {
-                path: "dashboard",
-                element: <Dashboard/>
+                path: "signup",
+                element: <SignUp/>
             }
         ]
     }
