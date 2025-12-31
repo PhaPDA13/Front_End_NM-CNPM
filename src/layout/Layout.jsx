@@ -2,18 +2,24 @@ import { Outlet } from "react-router-dom";
 import Footer from "./Footer";
 import Nav from "./Nav";
 
-export default function Layout(){
+export default function Layout() {
     return (
-        <>
-            <div className="flex">
-                <div>
-                    <Nav/>
-                </div>
-                <div>
-                    <Outlet/>
-                </div>
+        <div className="min-h-screen flex">
+            {/* NAV */}
+            <aside className="fixed top-0 left-0 h-screen w-64 z-50">
+                <Nav />
+            </aside>
+
+            {/* CONTENT */}
+            <div className="ml-64 flex flex-col flex-1 min-h-screen">
+                {/* Main content */}
+                <main className="flex-1 overflow-y-auto">
+                    <Outlet />
+                </main>
+
+                {/* Footer */}
+                <Footer />
             </div>
-            <Footer/>
-        </>
-    )
+        </div>
+    );
 }
