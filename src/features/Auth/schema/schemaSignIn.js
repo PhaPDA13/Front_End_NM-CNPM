@@ -1,11 +1,11 @@
 import * as yup from "yup";
 
 export const schema = yup.object({
-  email: yup
+  username: yup
     .string()
     .trim()
-    .required("Vui lòng nhập email")
-    .email("Email không hợp lệ"),
+    .required("Vui lòng nhập tên tài khoản")
+    .min(4, "Nhập ít nhất 4 kí tự"),
 
   password: yup
     .string()

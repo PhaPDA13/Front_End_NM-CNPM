@@ -8,6 +8,11 @@ export const schema = yup.object({
     .min(2, "Tên phải có ít nhất 2 ký tự")
     .max(100, "Tên quá dài"),
 
+  username: yup
+    .string()
+    .trim()
+    .required("Vui lòng nhập username"),
+
   email: yup
     .string()
     .trim()

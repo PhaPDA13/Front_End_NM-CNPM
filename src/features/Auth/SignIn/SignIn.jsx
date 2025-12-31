@@ -7,7 +7,8 @@ import { useForm } from 'react-hook-form';
 import { schema } from '../schema/schemaSignIn';
 import { yupResolver } from '@hookform/resolvers/yup';
 
-
+import {userLogin} from '../../Auth/authSlice'
+import { useDispatch, useSelector } from 'react-redux';
 
 const SignInPage = () => {
 
@@ -15,10 +16,15 @@ const SignInPage = () => {
 
   const navigate = useNavigate()
 
-  const onSubmit = (data) => {
-    console.log(data)
-    localStorage.setItem("accessToken", "true")
-    navigate("/")
+  const dispatch = useDispatch()
+
+  const onSubmit = async (data) => {
+    try {
+      await dispatch(userLogin(data)).unwrap();
+      navigate("/");
+    } catch (err) {
+      
+    }
   };
 
   return (
@@ -55,10 +61,10 @@ const SignInPage = () => {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <Input
-              label="Email"
-              placeholder="email@gmail.com"
-              {...register("email")}
-              error={errors.email}
+              label="username"
+              placeholder="username"
+              {...register("username")}
+              error={errors.username}
             />
             <Input
               label="Password"

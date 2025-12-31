@@ -4,21 +4,31 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Input from "../../../components/Input";
 import { schema } from "../schema/schemaSignUp";
+import { useDispatch} from "react-redux";
+import {userRegister } from "../authSlice";
 
 const SignUp = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset
   } = useForm({ resolver: yupResolver(schema) });
 
-  const naviagate = useNavigate()
-  const onSubmit = (data) => {
-    localStorage.setItem("accessToken", true)
-    console.log(data)
-    naviagate("/")
+  const dispatch = useDispatch()
 
-  };
+  const onSubmit = (data) => {
+    const {name, username, email, password} = data;
+    const dataRegister = {
+      name: name,
+      username,
+      email,
+      password
+    }
+    dispatch(userRegister(dataRegister))
+    reset()
+  };  
+
 
   return (
     <div className="flex h-screen w-full font-sans">
@@ -34,6 +44,13 @@ const SignUp = () => {
               placeholder="Nguyễn Văn A"
               {...register("name")}
               error={errors.name}
+            />
+
+             <Input
+              label="Tên đăng nhập"
+              placeholder="Tên đăng nhập"
+              {...register("username")}
+              error={errors.username}
             />
 
             <Input
