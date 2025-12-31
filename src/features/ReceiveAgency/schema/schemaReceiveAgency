@@ -1,0 +1,33 @@
+import * as yup from "yup";
+
+export const receiveAgentSchema = yup.object({
+  name: yup
+    .string()
+    .required("Vui lòng nhập tên đại lý"),
+
+  type: yup
+    .string()
+    .required("Vui lòng chọn loại đại lý"),
+
+  phone: yup
+    .string()
+    .matches(/^[0-9]{9,11}$/, "Số điện thoại không hợp lệ")
+    .required("Vui lòng nhập số điện thoại"),
+
+  district: yup
+    .string()
+    .required("Vui lòng chọn quận"),
+
+  email: yup
+    .string()
+    .email("Email không hợp lệ")
+    .required("Vui lòng nhập email"),
+
+  receiveDate: yup
+    .string()
+    .required("Vui lòng chọn ngày tiếp nhận"),
+
+  address: yup
+    .string()
+    .required("Vui lòng nhập địa chỉ")
+});

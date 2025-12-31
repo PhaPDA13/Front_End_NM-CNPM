@@ -3,11 +3,13 @@ import PublicRoute from "../components/PublicRoute";
 import SignIn from "../features/Auth/SignIn/SignIn";
 import SignUp from "../features/Auth/SignUp/SignUp";
 import DashBoard from "../features/DashBoard/DashBoard";
+import ReceiveAgencyPage from "../features/ReceiveAgency/ReceiveAgencyPage";
+import SearchAgencyPage from "../features/SearchAgency/SearchAgencyPage";
 import Layout from "../layout/Layout";
 
 const routers = [
     {
-        element: <PublicRoute />, 
+        element: <PublicRoute />,
         children: [
             {
                 path: '/signin',
@@ -22,25 +24,33 @@ const routers = [
 
     {
         path: '/',
-        element: <ProtectedRoute />, 
+        element: <ProtectedRoute />,
         children: [
             {
-                element: <Layout />, 
+                element: <Layout />,
                 children: [
                     {
-                        index: true, 
+                        index: true,
                         element: <DashBoard />
                     },
                     {
-                        path: 'dashboard', 
+                        path: 'dashboard',
                         element: <DashBoard />
+                    },
+                    {
+                        path: 'receive-agency',
+                        element: <ReceiveAgencyPage />
+                    },
+                    {
+                        path: 'search-agency',
+                        element: <SearchAgencyPage />
                     },
                 ]
             }
         ]
     },
 
-   
+
 ];
 
 export default routers;

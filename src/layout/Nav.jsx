@@ -17,8 +17,8 @@ import {
 // Dữ liệu cho các mục menu
 const navItems = [
   { icon: faHome, label: 'Dashboard', to: '/dashboard' },
-  { icon: faUserPlus, label: 'Tiếp nhận đại lý', to: '/onboard-agent' },
-  { icon: faSearch, label: 'Tra cứu đại lý', to: '/search-agent' },
+  { icon: faUserPlus, label: 'Tiếp nhận đại lý', to: '/receive-agency' },
+  { icon: faSearch, label: 'Tra cứu đại lý', to: '/search-agency' },
   { icon: faFileAlt, label: 'Lập phiếu xuất hàng', to: '/create-delivery' },
   { icon: faFileInvoiceDollar, label: 'Lập hóa phiếu thu tiền', to: '/create-receipt' },
   { icon: faChartPie, label: 'Báo cáo', to: '/reports' },
