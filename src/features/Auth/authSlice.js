@@ -22,9 +22,11 @@ export const userRegister = createAsyncThunk(
         try {
             console.log(userData)
              const response = await axiosClient.post('/user/', userData);
+             console.log(response)
              return response;
         } catch (error) {
-            return thunkApi.rejectWithValue(error.response?.message || "Error khi dang ky")
+            console.log(error)
+            return thunkApi.rejectWithValue(error.response?.data?.error?.message || "Error khi dang ky")
         }
     }
 )
@@ -65,11 +67,11 @@ const authSlice = createSlice({
         })  
         buider.addCase(userRegister.fulfilled, (state, action)=>{
             state.isLoading = false;
-            toast.success(action.payload.message ?? "")
+            toast.success(action.payload.message ?? "Create successful account")
         })
         buider.addCase(userRegister.rejected, (state, action)=>{
             state.isLoading = false;
-            toast.error(action.payload.message ?? "Error")
+            toast.error(action.payload ?? "Error")
         })
     }
 })

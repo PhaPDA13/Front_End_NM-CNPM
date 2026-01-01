@@ -5,7 +5,7 @@ export const receiveAgentSchema = yup.object({
     .string()
     .required("Vui lòng nhập tên đại lý"),
 
-  type: yup
+  agentTypeId: yup
     .string()
     .required("Vui lòng chọn loại đại lý"),
 
@@ -14,7 +14,7 @@ export const receiveAgentSchema = yup.object({
     .matches(/^[0-9]{9,11}$/, "Số điện thoại không hợp lệ")
     .required("Vui lòng nhập số điện thoại"),
 
-  district: yup
+  districtId: yup
     .string()
     .required("Vui lòng chọn quận"),
 
@@ -22,10 +22,6 @@ export const receiveAgentSchema = yup.object({
     .string()
     .email("Email không hợp lệ")
     .required("Vui lòng nhập email"),
-
-  receiveDate: yup
-    .string()
-    .required("Vui lòng chọn ngày tiếp nhận"),
 
   address: yup
     .string()

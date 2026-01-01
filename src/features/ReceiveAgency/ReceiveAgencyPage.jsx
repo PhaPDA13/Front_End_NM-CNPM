@@ -1,19 +1,28 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Input from "../../components/Input";
-import { receiveAgentSchema } from "./schema/schemaReceiveAgency";
+import { receiveAgentSchema } from "./schema/schemaReceiveAgency.js";
+import agencyApi from "../../services/agencyApi.js";
+import { toast } from "react-toastify";
 
 function ReceiveAgentPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    reset
   } = useForm({
     resolver: yupResolver(receiveAgentSchema)
   });
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+   try {
+      const response = await agencyApi.create(data)
+      toast.success("Create agent")
+      reset()
+   } catch (error) {
+      toast.error(error?.response?.data?.error?.message ?? "Failed")
+   }
   };
   return (
     <div className="p-8 bg-white min-h-full">
@@ -28,7 +37,7 @@ function ReceiveAgentPage() {
       </div>
 
       {/* Form Card */}
-      <div className="bg-white rounded-xl shadow-sm p-6 max-w-5xl">
+      <div className="bg-white rounded-xl shadow-sm p-6 max-w-5xl relative left-1/2 top-1/2 -translate-x-1/2">
         <h2 className="text-lg font-semibold text-gray-800 mb-1">
           Thông tin đại lý
         </h2>
@@ -54,7 +63,7 @@ function ReceiveAgentPage() {
               Loại đại lý
             </label>
             <select
-              {...register("type")}
+              {...register("agentTypeId")}
               className={`w-full p-4 rounded-xl bg-gray-100 text-gray-800
             border transition duration-150 outline-0
             ${errors.type ? "border-red-500" : "border-gray-300"}`}
@@ -63,9 +72,9 @@ function ReceiveAgentPage() {
               <option value="1">Loại 1</option>
               <option value="2">Loại 2</option>
             </select>
-            {errors.type && (
+            {errors.agentTypeId && (
               <p className="text-red-500 text-sm mt-1">
-                {errors.type.message}
+                {errors.agentTypeId.message && ""}
               </p>
             )}
           </div>
@@ -85,10 +94,10 @@ function ReceiveAgentPage() {
             </label>
             <select
               defaultValue=""
-              {...register("district")}
+              {...register("districtId")}
               className={`w-full p-4 rounded-xl bg-gray-100 text-gray-800
             border transition duration-150 outline-0
-            ${errors.district ? "border-red-500" : "border-gray-300"}`}
+            ${errors.districtId ? "border-red-500" : "border-gray-300"}`}
             >
               <option value="" disabled>
                 Chọn Quận
@@ -99,9 +108,9 @@ function ReceiveAgentPage() {
                 </option>
               ))}
             </select>
-            {errors.district && (
+            {errors.districtId && (
               <p className="text-red-500 text-sm mt-1">
-                {errors.district.message}
+                {errors.districtId.message ?? ""}
               </p>
             )}
           </div>
@@ -113,14 +122,6 @@ function ReceiveAgentPage() {
             placeholder="username@example.com"
             error={errors.email}
             {...register("email")}
-          />
-
-          {/* Ngày tiếp nhận */}
-          <Input
-            label="Ngày tiếp nhận"
-            type="date"
-            error={errors.receiveDate}
-            {...register("receiveDate")}
           />
 
           {/* Địa chỉ */}
