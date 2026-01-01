@@ -61,7 +61,7 @@ const SignInPage = () => {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <Input
-              label="username"
+              label="Username"
               placeholder="username"
               {...register("username")}
               error={errors.username}
@@ -69,6 +69,7 @@ const SignInPage = () => {
             <Input
               label="Password"
               type="password"
+              placeholder="*********"
               {...register("password")}
               error={errors.password}
             />

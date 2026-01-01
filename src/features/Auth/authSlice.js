@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosClient from "../../services/axiosClient";
 import { toast } from 'react-toastify'; 
-import { setAccessToken } from "../../services/axiosClient";
+
 
 export const userLogin = createAsyncThunk(
     'user/login',
     async (userData, thunkApi ) => {
         try{
-            const response = await axiosClient.post('/login', userData)
+            const response = await axiosClient.post('/user/login', userData)
             return response;
         }
         catch(error){
@@ -21,14 +21,13 @@ export const userRegister = createAsyncThunk(
     async(userData, thunkApi)=>{
         try {
             console.log(userData)
-             const response = await axiosClient.post('/user/auth/register', userData);
+             const response = await axiosClient.post('/user/', userData);
              return response;
         } catch (error) {
             return thunkApi.rejectWithValue(error.response?.message || "Error khi dang ky")
         }
     }
 )
-
 
 const initialState = {
   isLoading: false,
@@ -41,13 +40,18 @@ const authSlice = createSlice({
     reducers: {
         logout: (state)=>{
             state.accessToken = null
+        },
+        setCredentials: (state, action)=>{
+            if(action.payload.accessToken){
+                state.accessToken = action.payload.accessToken
+            }
         }
     },
     extraReducers: (buider)=>{
         buider.addCase(userLogin.fulfilled, (state, action)=>{
             state.isLoading = false;
-            toast.success("Đăng nhập thành công!!!")
-            setAccessToken(action.payload.accessToken)
+            state.accessToken = action.payload.accessToken
+            toast.success(action.payload.message)
         })
         buider.addCase(userLogin.pending, (state, action)=>{
             state.isLoading = true;
@@ -65,10 +69,10 @@ const authSlice = createSlice({
         })
         buider.addCase(userRegister.rejected, (state, action)=>{
             state.isLoading = false;
-            toast.error("Username or email already exist")
+            toast.error(action.payload.message ?? "Error")
         })
     }
 })
 
 export default authSlice.reducer
-export const {logout} = authSlice.actions
+export const {logout, setCredentials} = authSlice.actions

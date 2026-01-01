@@ -18,9 +18,9 @@ const SignUp = () => {
   const dispatch = useDispatch()
 
   const onSubmit = (data) => {
-    const {name, username, email, password} = data;
+    const {fullName, username, email, password} = data;
     const dataRegister = {
-      name: name,
+      fullName,
       username,
       email,
       password
@@ -42,8 +42,8 @@ const SignUp = () => {
             <Input
               label="Họ tên"
               placeholder="Nguyễn Văn A"
-              {...register("name")}
-              error={errors.name}
+              {...register("fullName")}
+              error={errors.fullName}
             />
 
              <Input

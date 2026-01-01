@@ -13,11 +13,15 @@ export const agencySchema = yup.object({
     .required("Email không được để trống")
     .email("Email không hợp lệ"),
 
+  debtAmount: yup
+    .number()
+    .typeError("Công nợ phải là số")
+    .nullable()
+    .transform((value, originalValue) => (String(originalValue).trim() === "" ? null : value)), 
+
   address: yup.string().required("Địa chỉ không được để trống"),
 
-  receiveDate: yup.string().required("Chọn ngày tiếp nhận"),
+  agentTypeId: yup.string().required("Chọn loại đại lý"),
 
-  type: yup.string().required("Chọn loại đại lý"),
-
-  district: yup.string().required("Chọn quận"),
+  districtId: yup.string().required("Chọn quận"),
 });
