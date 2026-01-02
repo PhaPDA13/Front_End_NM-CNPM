@@ -6,8 +6,12 @@ import DashBoard from "../features/DashBoard/DashBoard";
 import ReceiveAgencyPage from "../features/ReceiveAgency/ReceiveAgencyPage";
 import SearchAgencyPage from "../features/SearchAgency/SearchAgencyPage";
 import ExportInvoicePage from "../features/ExportInvoice/ExportInvoicePage";
+import CreateExportInvoicePage from "../features/ExportInvoice/CreateExportInvoicePage";
 import InvoicePage from "../features/Invoice/InvoicePage";
+import CreateInvoicePage from "../features/Invoice/CreateInvoicePage";
+import EditRulesPage from "../features/EditRules/EditRulesPage";
 import Layout from "../layout/Layout";
+
 
 const routers = [
     {
@@ -48,12 +52,24 @@ const routers = [
                         element: <SearchAgencyPage />
                     },
                     {
-                        path: 'create-export',
+                        path: 'list-export',
                         element: <ExportInvoicePage />
                     },
                     {
-                        path: 'create-invoice',
+                        path: 'list-export/create-export',
+                        element: <CreateExportInvoicePage />
+                    },
+                    {
+                        path: 'list-invoice',
                         element: <InvoicePage />
+                    },
+                    {
+                        path: 'list-invoice/create-invoice',
+                        element: <CreateInvoicePage />
+                    },
+                    {
+                        path: 'edit-rules',
+                        element: <EditRulesPage />
                     },
                 ]
             }

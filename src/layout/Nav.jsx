@@ -19,8 +19,8 @@ const navItems = [
   { icon: faHome, label: 'Dashboard', to: '/dashboard' },
   { icon: faUserPlus, label: 'Tiếp nhận đại lý', to: '/receive-agency' },
   { icon: faSearch, label: 'Tra cứu đại lý', to: '/search-agency' },
-  { icon: faFileAlt, label: 'Lập phiếu xuất hàng', to: '/create-export' },
-  { icon: faFileInvoiceDollar, label: 'Lập hóa phiếu thu tiền', to: '/create-invoice' },
+  { icon: faFileAlt, label: 'Quản lý xuất hàng', to: '/list-export' },
+  { icon: faFileInvoiceDollar, label: 'Quản lý thu tiền', to: '/list-invoice' },
   { icon: faChartPie, label: 'Báo cáo', to: '/reports' },
   { icon: faEdit, label: 'Thay đổi quy định', to: '/edit-rules' },
 ];

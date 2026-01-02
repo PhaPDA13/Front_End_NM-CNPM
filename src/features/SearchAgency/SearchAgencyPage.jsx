@@ -1,342 +1,222 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect } from "react";
-import { agencySchema } from "./schema/schemaSearchAgency";
-
+import { useRef, useState, useEffect, useMemo } from "react";
+import axiosClient from "../../services/axiosClient";
+import LoadingBar from "react-top-loading-bar";
+import UpdateAgencyModal from "./ModalPopup/UpdateAgencyModal";
+import {
+  FaSort,
+  FaSortUp,
+  FaSortDown,
+} from "react-icons/fa";
+import AgencyTableRow from "./Components/AgencyTableRow";
+import AgencyFilterBar from "./Components/AgencyFilterBar";
+import Pagination from "./Components/Pagination";
+import { toast } from "react-toastify";
 
 function SearchAgencyPage() {
-  const agencies = [
-    {
-      id: "001",
-      name: "Đại lý Hoàng Long",
-      type: "Loại 2",
-      phone: "0987654321",
-      email: "hoanglong@example.com",
-      address: "456 Lê Lợi, Quận 3, TP.HCM",
-      debt: 8000000,
-    },
-    {
-      id: "002",
-      name: "Đại lý Hoàng Long",
-      type: "Loại 1",
-      phone: "0987654321",
-      email: "hoanglong@example.com",
-      address: "456 Lê Lợi, Quận 3, TP.HCM",
-      debt: 8000000,
-    },
-    {
-      id: "003",
-      name: "Đại lý Hoàng Long",
-      type: "Loại 2",
-      phone: "0987654321",
-      email: "hoanglong@example.com",
-      address: "456 Lê Lợi, Quận 3, TP.HCM",
-      debt: 8000000,
-    },
-  ];
-
+  const [agencies, setAgencies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedAgency, setSelectedAgency] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const loadingBarRef = useRef(null);
+
+  const [filters, setFilters] = useState({
+    keyword: "",
+    type: "ALL",
+    district: "ALL",
+    sort: "",
+  });
+
+  const fetchAgents = async () => {
+    try {
+      setIsLoading(true);
+      loadingBarRef.current?.continuousStart();
+      const response = await axiosClient.get("/api/agents/");
+      setAgencies(response.data);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách:", error);
+    } finally {
+      setIsLoading(false);
+      loadingBarRef.current?.complete();
+    }
+  };
+
+  useEffect(() => {
+    fetchAgents();
+  }, []);
+
+  const filteredAgencies = useMemo(() => {
+    let result = [...agencies];
+    if (filters.keyword) {
+      console.log(result)
+      console.log(filters.keyword)
+      const lowerKey = filters.keyword.toLowerCase();
+      result = result.filter(
+        (item) =>
+          item.name.toLowerCase().includes(lowerKey) ||
+          item.id.toString().includes(lowerKey) ||
+          item.address.toLowerCase().includes(lowerKey)
+      );
+    }
+    if (filters.type !== "ALL") {
+      console.log(result);
+      console.log(filters.type);
+      result = result.filter((item) => item.agentType?.name == filters.type);
+    }
+
+    if (filters.district !== "ALL") {
+      console.log(filters.district);
+      console.log(result);
+      result = result.filter((item) => filters.district == item.district.name);
+    }
+
+    if (filters.sort) {
+      result.sort((a, b) => {
+        return filters.sort === "asc"
+          ? a.debtAmount - b.debtAmount
+          : b.debtAmount - a.debtAmount;
+      });
+    }
+
+    return result;
+  }, [agencies, filters]);
+
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(filteredAgencies.length / itemsPerPage);
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredAgencies.slice(start, start + itemsPerPage);
+  }, [filteredAgencies, currentPage]);
+
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+    setCurrentPage(1);
+  };
+
+  const handleResetFilters = () => {
+    setFilters({ keyword: "", type: "ALL", district: "ALL", sort: "" });
+    setCurrentPage(1);
+  };
+
+  const handleSortToggle = () => {
+    setFilters((prev) => ({
+      ...prev,
+      sort: prev.sort === "asc" ? "desc" : "asc",
+    }));
+  };
+
+  const handleEditClick = (agency) => {
+    setSelectedAgency(agency);
+    setOpen(true);
+  };
+
+  const handleDeleteClick = async (agencyId) => {
+    if (
+      window.confirm(
+        "Bạn có chắc chắn muốn xoá đại lý này không? Hành động này không thể hoàn tác."
+      )
+    ) {
+      try {
+        setIsLoading(true);
+        await axiosClient.delete(`/api/agents/${agencyId}`);
+        setAgencies((prevList) =>
+          prevList.filter((item) => item.id !== agencyId)
+        );
+        toast.success("Xoá thành công");
+      } catch (error) {
+        console.error("Lỗi khi xoá:", error);
+        toast.error("Lỗi khi xoá");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
   return (
-    <div className="p-6">
-      {/* Title */}
-      <h1 className="text-xl font-semibold mb-6">
-        Tra cứu đại lý
-      </h1>
-
-      {/* Filters */}
-      <div className="flex flex-wrap items-end gap-4">
-        <input
-          placeholder="🔍 Tìm kiếm"
-          className="h-14 w-64 px-4 rounded-xl bg-gray-100 border border-gray-300 outline-0"
-        />
-
-        <select className="h-14 px-4 rounded-xl bg-gray-100 border border-gray-300">
-          <option>Tất cả</option>
-          <option>Loại 1</option>
-          <option>Loại 2</option>
-        </select>
-
-        <select className="h-14 px-4 rounded-xl bg-gray-100 border border-gray-300">
-          <option>Tất cả</option>
-          {Array.from({ length: 20 }, (_, i) => (
-            <option key={i + 1} value={i + 1}>
-              Quận {i + 1}
-            </option>
-          ))}
-        </select>
-
-        <button className="h-14 px-6 rounded-xl bg-cyan-500 text-white font-medium hover:bg-cyan-600">
-          Lọc
-        </button>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800">Quản Lý Đại Lý</h1>
       </div>
-
-      {/* Table */}
-      <div className="mt-6 bg-white rounded-xl shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-700">
-            <tr>
-              <th className="p-4 text-left">MÃ</th>
-              <th className="p-4 text-left">TÊN ĐẠI LÝ</th>
-              <th className="p-4 text-left">LOẠI</th>
-              <th className="p-4 text-left">THÔNG TIN LIÊN HỆ</th>
-              <th className="p-4 text-left">ĐỊA CHỈ</th>
-              <th className="p-4 text-left">CÔNG NỢ</th>
-              <th className="p-4"></th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {agencies.map((a) => (
-              <tr key={a.id} className="border-t">
-                <td className="p-4">{a.id}</td>
-
-                <td className="p-4 font-medium">{a.name}</td>
-
-                <td className="p-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium
-                      ${a.type === "Loại 2"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-purple-100 text-purple-600"
-                      }`}
-                  >
-                    {a.type}
-                  </span>
-                </td>
-
-                <td className="p-4 text-gray-600">
-                  <div>📞 {a.phone}</div>
-                  <div>✉️ {a.email}</div>
-                </td>
-
-                <td className="p-4 text-gray-600">
-                  {a.address}
-                </td>
-
-                <td className="p-4 text-red-600 font-semibold">
-                  {a.debt.toLocaleString()} đ
-                </td>
-
-                <td className="p-4">
-                  <button onClick={() => {
-                    setSelectedAgency(a);
-                    setOpen(true);
-                  }}
-                    className="px-4 py-1 bg-cyan-500 text-white rounded-lg text-sm">
-                    Cập nhật
-                  </button>
-                </td>
+      <AgencyFilterBar
+        filters={filters}
+        onChange={handleFilterChange}
+        onReset={handleResetFilters}
+      />
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gray-50 text-gray-600 font-semibold border-b border-gray-200">
+              <tr>
+                <th className="p-4 w-16">Mã</th>
+                <th className="p-4">Tên Đại Lý</th>
+                <th className="p-4">Loại</th>
+                <th className="p-4">Liên Hệ</th>
+                <th className="p-4">Địa Chỉ</th>
+                <th
+                  className="p-4 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                  onClick={handleSortToggle}
+                >
+                  <div className="flex items-center gap-1 text-cyan-700">
+                    Công Nợ
+                    {filters.sort === "asc" && <FaSortUp />}
+                    {filters.sort === "desc" && <FaSortDown />}
+                    {!filters.sort && <FaSort className="text-gray-300" />}
+                  </div>
+                </th>
+                <th className="p-4 text-center">Tác vụ</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Pagination */}
-        <div className="flex justify-end items-center gap-2 p-4">
-          <button className="px-3 py-1">Trước</button>
-          <button className="px-3 py-1 bg-cyan-500 text-white rounded">
-            1
-          </button>
-          <button className="px-3 py-1">2</button>
-          <button className="px-3 py-1">3</button>
-          <button className="px-3 py-1">Sau</button>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {isLoading ? (
+                <tr>
+                  <td colSpan="7" className="p-8 text-center text-gray-500">
+                    <div className="flex justify-center items-center gap-2">
+                      <span className="animate-spin">⏳</span> Đang tải dữ
+                      liệu...
+                    </div>
+                  </td>
+                </tr>
+              ) : paginatedData.length > 0 ? (
+                paginatedData.map((agency) => (
+                  <AgencyTableRow
+                    key={agency.id}
+                    agency={agency}
+                    onEdit={handleEditClick}
+                    onDelete={handleDeleteClick}
+                  />
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="py-12 text-center">
+                    <div className="flex flex-col items-center justify-center text-gray-400">
+                      <span className="text-4xl mb-2">🔍</span>
+                      <p>Không tìm thấy kết quả nào phù hợp.</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+          totalItems={filteredAgencies.length}
+          currentCount={paginatedData.length}
+        />
       </div>
       <UpdateAgencyModal
         open={open}
         agency={selectedAgency}
         onClose={() => setOpen(false)}
+        onReload={fetchAgents}
       />
     </div>
   );
 }
 
-function UpdateAgencyModal({ open, onClose, agency }) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm({
-    resolver: yupResolver(agencySchema),
-    defaultValues: agency,
-  });
-
-  useEffect(() => {
-    if (agency) {
-      reset(agency);
-    }
-  }, [agency, reset]);
-
-  if (!open || !agency) return null;
-
-  const onSubmit = (data) => {
-    console.log("DATA UPDATE:", data);
-    onClose();
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl w-[800px] p-6">
-        <h2 className="text-xl font-semibold mb-6">
-          Cập nhật đại lý
-        </h2>
-
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="grid grid-cols-2 gap-4"
-        >
-          {/* Tên đại lý */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Tên đại lý
-            </label>
-            <input
-              {...register("name")}
-              className="border p-3 rounded-lg w-full"
-              placeholder="Nhập tên đại lý"
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.name.message}
-              </p>
-            )}
-          </div>
-
-          {/* Ngày tiếp nhận */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Ngày tiếp nhận
-            </label>
-            <input
-              type="date"
-              {...register("receiveDate")}
-              className="border p-3 rounded-lg w-full"
-            />
-            {errors.receiveDate && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.receiveDate.message}
-              </p>
-            )}
-          </div>
-
-          {/* Điện thoại */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Số điện thoại
-            </label>
-            <input
-              {...register("phone")}
-              className="border p-3 rounded-lg w-full"
-              placeholder="Nhập số điện thoại"
-            />
-            {errors.phone && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.phone.message}
-              </p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Email
-            </label>
-            <input
-              {...register("email")}
-              className="border p-3 rounded-lg w-full"
-              placeholder="example@email.com"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-
-          {/* Loại đại lý */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Loại đại lý
-            </label>
-            <select
-              {...register("type")}
-              className="border p-3 rounded-lg w-full bg-white"
-            >
-              <option value="">-- Chọn loại --</option>
-              <option value="Loại 1">Loại 1</option>
-              <option value="Loại 2">Loại 2</option>
-            </select>
-            {errors.type && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.type.message}
-              </p>
-            )}
-          </div>
-
-          {/* Quận */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Quận
-            </label>
-            <select
-              {...register("district")}
-              className="border p-3 rounded-lg w-full bg-white"
-            >
-              <option value="">-- Chọn quận --</option>
-              {Array.from({ length: 20 }, (_, i) => (
-                <option key={i + 1} value={`Quận ${i + 1}`}>
-                  Quận {i + 1}
-                </option>
-              ))}
-            </select>
-            {errors.district && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.district.message}
-              </p>
-            )}
-          </div>
-
-          {/* Địa chỉ */}
-          <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">
-              Địa chỉ
-            </label>
-            <input
-              {...register("address")}
-              className="border p-3 rounded-lg w-full"
-              placeholder="Nhập địa chỉ đại lý"
-            />
-            {errors.address && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.address.message}
-              </p>
-            )}
-          </div>
-
-          {/* Buttons */}
-          <div className="col-span-2 flex justify-end gap-3 mt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2 border rounded-lg"
-            >
-              Hủy
-            </button>
-
-            <button
-              type="submit"
-              className="px-6 py-2 bg-cyan-500 text-white rounded-lg"
-            >
-              Lưu
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
 export default SearchAgencyPage;

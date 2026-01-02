@@ -1,211 +1,90 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { exportInvoiceSchema } from "./schema/schemaExportInvoice";
-import { exportItemSchema } from "./schema/schemaItem";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import billApi from "../../services/billApi";
 
+function ExportInvoiceListPage() {
+  const [invoices, setInvoices] = useState([]);
+  const navigate = useNavigate();
 
-function ExportInvoicePage() {
-  const [items, setItems] = useState([]);
-
-  /* -------- FORM LẬP PHIẾU -------- */
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(exportInvoiceSchema),
-  });
-
-  /* -------- FORM THÊM HÀNG -------- */
-  const {
-    register: registerItem,
-    handleSubmit: handleSubmitItem,
-    reset: resetItem,
-    formState: { errors: itemErrors },
-  } = useForm({
-    resolver: yupResolver(exportItemSchema),
-  });
-
-  /* -------- SUBMIT -------- */
-  const onSubmitInvoice = (data) => {
-    if (items.length === 0) {
-      alert("Phiếu xuất phải có ít nhất 1 mặt hàng");
-      return;
-    }
-
-    const payload = {
-      ...data,
-      items,
-      total: items.reduce((sum, i) => sum + i.amount, 0),
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        const res = await billApi.getAll();
+        setInvoices(res.data);
+      } catch (error) {
+        console.error("Lỗi tải danh sách phiếu xuất", error);
+      }
     };
-
-    console.log("PHIẾU XUẤT:", payload);
-    alert("Lập phiếu thành công (xem console)");
-  };
-
-  const totalMoney = items.reduce((sum, i) => sum + i.amount, 0);
+    fetchInvoices();
+  }, []);
+  
 
   return (
-    <div className="p-6 space-y-8">
-      <h1 className="text-2xl font-semibold">Lập phiếu xuất hàng</h1>
+    <div className="min-h-screen bg-gray-50 p-6 md:p-10">
+      <div className="mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">
+            Danh sách phiếu xuất hàng
+          </h1>
 
-      {/* ================= FORM LẬP PHIẾU ================= */}
-      <form
-        onSubmit={handleSubmit(onSubmitInvoice)}
-        className="bg-white p-6 rounded-xl shadow space-y-4"
-      >
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="font-medium">Đại lý</label>
-            <input
-              {...register("agencyID")}
-              className="w-full border p-3 rounded-lg"
-              placeholder="Tên đại lý"
-            />
-            <p className="text-red-500 text-sm">{errors.agencyId?.message}</p>
-          </div>
-
-          <div>
-            <label className="font-medium">Ngày xuất</label>
-            <input
-              type="date"
-              {...register("createdDate")}
-              className="w-full border p-3 rounded-lg"
-            />
-            <p className="text-red-500 text-sm">
-              {errors.createdDate?.message}
-            </p>
-          </div>
-        </div>
-
-        {/* ================= THÊM HÀNG ================= */}
-        <div className="mt-6">
-          <h2 className="font-semibold text-lg mb-2">Thêm mặt hàng</h2>
-
-          <div className="grid grid-cols-4 gap-3 items-end">
-            <div>
-              <label>Mặt hàng</label>
-              <input
-                {...registerItem("product")}
-                className="w-full border p-2 rounded"
-              />
-              <p className="text-red-500 text-sm">
-                {itemErrors.product?.message}
-              </p>
-            </div>
-
-            <div>
-              <label>ĐVT</label>
-              <input
-                {...registerItem("unit")}
-                className="w-full border p-2 rounded"
-              />
-              <p className="text-red-500 text-sm">
-                {itemErrors.unit?.message}
-              </p>
-            </div>
-
-            <div>
-              <label>Số lượng</label>
-              <input
-                type="number"
-                {...registerItem("quantity")}
-                className="w-full border p-2 rounded"
-              />
-              <p className="text-red-500 text-sm">
-                {itemErrors.quantity?.message}
-              </p>
-            </div>
-
-            <div>
-              <label>Đơn giá</label>
-              <input
-                type="number"
-                {...registerItem("price")}
-                className="w-full border p-2 rounded"
-              />
-              <p className="text-red-500 text-sm">
-                {itemErrors.price?.message}
-              </p>
-            </div>
-          </div>
           <button
-            type="button"
-            onClick={handleSubmitItem((data) => {
-              setItems((prev) => [
-                ...prev,
-                {
-                  ...data,
-                  quantity: Number(data.quantity),
-                  price: Number(data.price),
-                  amount: data.quantity * data.price,
-                },
-              ]);
-              resetItem();
-            })}
-            className="bg-black text-white h-10 rounded-lg w-20 mt-3"
+            onClick={() => navigate("/list-export/create-export")}
+            className="h-12 px-6 rounded-xl bg-cyan-500 text-white font-bold hover:bg-cyan-600 shadow"
           >
-            Thêm
+            + Lập phiếu xuất
           </button>
         </div>
 
-
-        {/* ================= BẢNG HÀNG ================= */}
-        <table className="w-full border mt-5">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border p-2">Mặt hàng</th>
-              <th className="border p-2">ĐVT</th>
-              <th className="border p-2">SL</th>
-              <th className="border p-2">Đơn giá</th>
-              <th className="border p-2">Thành tiền</th>
-              <th className="border p-2">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((i, idx) => (
-              <tr key={idx}>
-                <td className="border p-2">{i.product}</td>
-                <td className="border p-2">{i.unit}</td>
-                <td className="border p-2 text-right">{i.quantity}</td>
-                <td className="border p-2 text-right">
-                  {i.price.toLocaleString()}
-                </td>
-                <td className="border p-2 text-right">
-                  {i.amount.toLocaleString()}
-                </td>
-                <td className="border p-2 text-center">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setItems(items.filter((_, index) => index !== idx))
-                    }
-                    className="text-red-500 hover:text-red-700 cursor-pointer"
-                  >
-                    🗑️
-                  </button>
-                </td>
+        <div className="rounded-2xl bg-white shadow overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-100">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500">
+                  Mã phiếu
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500">
+                  Đại lý
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500">
+                  Ngày xuất
+                </th>
+                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500">
+                  Tổng tiền
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
 
-        <div className="text-right font-semibold">
-          Tổng tiền: {totalMoney.toLocaleString()} đ
+            <tbody className="divide-y divide-gray-100 bg-white">
+              {invoices.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-10 text-center text-gray-400">
+                    Chưa có phiếu xuất nào
+                  </td>
+                </tr>
+              ) : (
+                invoices.map((inv) => (
+                  <tr key={inv.id} className="hover:bg-blue-50/50">
+                    <td className="px-6 py-4 font-medium">
+                      PX{inv.id}
+                    </td>
+                    <td className="px-6 py-4">
+                      {inv.agent?.name}
+                    </td>
+                    <td className="px-6 py-4">
+                      {new Date(inv.issueDate).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold">
+                      {inv.totalAmount?.toLocaleString()} VNĐ
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="px-8 py-3 bg-cyan-500 text-white rounded-lg"
-          >
-            Lập phiếu
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   );
 }
 
-export default ExportInvoicePage;
+export default ExportInvoiceListPage;

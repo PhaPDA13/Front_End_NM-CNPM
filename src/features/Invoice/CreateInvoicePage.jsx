@@ -1,0 +1,202 @@
+import { useForm, Controller } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { invoiceSchema } from "./schema/schemaInvoice";
+// import { useDispatch } from "react-redux";
+// import { addReceipt } from "./receiptSlice";
+import { useNavigate } from "react-router-dom";
+import Select from "../../components/Select";
+import Input from "../../components/Input";
+import agencyApi from "../../services/agencyApi";
+
+function CreateReceiptPage() {
+  const navigate = useNavigate();
+  const [agencies, setAgencies] = useState([]);
+  const [debt, setDebt] = useState(0);
+  const [loadingDebt, setLoadingDebt] = useState(false);
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(invoiceSchema),
+  });
+
+  const agentId = watch("agentId");
+  const amount = watch("amount");
+
+  /* ================= FETCH DATA ================= */
+  useEffect(() => {
+    agencyApi.getAll().then((res) => setAgencies(res.data));
+  }, []);
+
+  useEffect(() => {
+    if (!agentId) {
+      setDebt(0);
+      setValue("amount", "");
+      return;
+    }
+
+    const fetchDebt = async () => {
+      try {
+        setLoadingDebt(true);
+        const res = await receiptApi.getDebt(agentId);
+        setDebt(res.data.debt);
+      } catch {
+        toast.error("Không lấy được công nợ đại lý");
+      } finally {
+        setLoadingDebt(false);
+      }
+    };
+
+    fetchDebt();
+  }, [agentId, setValue]);
+
+  /* ================= VALIDATE AMOUNT ================= */
+  useEffect(() => {
+    if (!amount || !debt) return;
+
+    if (Number(amount) > debt) {
+      setError("amount", {
+        message: "Số tiền thu không được vượt quá công nợ",
+      });
+    } else {
+      clearErrors("amount");
+    }
+  }, [amount, debt, setError, clearErrors]);
+
+  /* ================= SUBMIT ================= */
+  const onSubmit = async (data) => {
+    try {
+      await receiptApi.create({
+        agentId: Number(data.agentId),
+        receiptDate: data.receiptDate,
+        amount: Number(data.amount),
+      });
+
+      toast.success("Lập phiếu thu thành công");
+      navigate("/list-invoice");
+    } catch {
+      toast.error("Có lỗi khi lập phiếu thu");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6 md:p-10 font-sans">
+      <div className="mx-auto">
+        <h1 className="mb-8 text-3xl font-bold text-gray-800 tracking-tight">
+          Lập phiếu thu tiền
+        </h1>
+
+        <div className="rounded-3xl bg-white p-8 shadow-xl shadow-gray-200/50">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
+            {/* ===== THÔNG TIN CHUNG ===== */}
+            <div>
+              <h2 className="mb-6 text-xl font-bold text-gray-800 border-b border-gray-100 pb-2">
+                Thông tin phiếu thu
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Controller
+                  name="agentId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      label="Đại lý"
+                      placeholder="-- Chọn đại lý --"
+                      options={agencies}
+                      error={errors.agentId}
+                      {...field}
+                    />
+                  )}
+                />
+
+                <Input
+                  type="date"
+                  label="Ngày thu tiền"
+                  {...register("receiptDate")}
+                  error={errors.receiptDate}
+                />
+              </div>
+            </div>
+
+            {/* ===== CÔNG NỢ ===== */}
+            <div>
+              <h2 className="mb-4 text-xl font-bold text-gray-800 border-b border-gray-100 pb-2">
+                Công nợ đại lý
+              </h2>
+
+              <div className="rounded-2xl bg-slate-50 p-6 border border-slate-100">
+                <p className="text-sm text-gray-500 mb-2">
+                  Công nợ hiện tại
+                </p>
+
+                <p className="text-4xl font-bold text-gray-900">
+                  {loadingDebt ? "Đang tải..." : debt.toLocaleString()}
+                  <span className="ml-2 text-xl text-gray-400 font-medium">
+                    VNĐ
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            {/* ===== NHẬP TIỀN THU ===== */}
+            <div>
+              <h2 className="mb-4 text-xl font-bold text-gray-800 border-b border-gray-100 pb-2">
+                Số tiền thu
+              </h2>
+
+              <Input
+                type="number"
+                label="Số tiền muốn thu"
+                placeholder="Nhập số tiền"
+                {...register("amount")}
+                error={errors.amount}
+              />
+
+              <p className="mt-2 text-sm text-gray-500">
+                Số tiền tối đa có thể thu:{" "}
+                <span className="font-semibold text-gray-700">
+                  {debt.toLocaleString()} VNĐ
+                </span>
+              </p>
+            </div>
+
+            {/* ===== ACTION ===== */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-6 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => navigate("/list-invoice")}
+                className="w-full md:w-auto h-14 px-6 rounded-xl
+                border border-gray-300 text-gray-700 font-semibold
+                hover:bg-gray-100 transition-all"
+              >
+                Quay lại
+              </button>
+
+              <button
+                type="submit"
+                disabled={!agentId || debt <= 0}
+                className="w-full md:w-auto h-14 px-10 rounded-xl
+                bg-cyan-500 text-white font-bold text-lg
+                hover:bg-cyan-600 shadow-lg shadow-cyan-200
+                transition-all transform active:scale-95
+                disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Hoàn tất thu tiền
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default CreateReceiptPage;
