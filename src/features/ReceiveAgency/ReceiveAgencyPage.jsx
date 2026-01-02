@@ -25,7 +25,7 @@ function ReceiveAgentPage() {
     }
   };
   return (
-    <div className="p-8 bg-white min-h-full">
+    <div className="p-8 bg-gray-50 min-h-full">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">
@@ -135,7 +135,7 @@ function ReceiveAgentPage() {
           <div className="md:col-span-2 flex justify-end">
             <button
               type="submit"
-              className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg font-medium shadow"
+              className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg font-medium shadow cursor-pointer"
             >
               Tiếp nhận đại lý
             </button>

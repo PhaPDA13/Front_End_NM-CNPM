@@ -19,7 +19,7 @@ function ReceiptInvoiceListPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-10">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -29,7 +29,7 @@ function ReceiptInvoiceListPage() {
 
           <button
             onClick={() => navigate("/list-invoice/create-invoice")}
-            className="h-12 px-6 rounded-xl bg-cyan-500 text-white font-bold hover:bg-cyan-600 shadow"
+            className="h-12 px-6 rounded-xl bg-cyan-500 text-white font-bold hover:bg-cyan-600 shadow cursor-pointer"
           >
             + Lập phiếu thu tiền
           </button>

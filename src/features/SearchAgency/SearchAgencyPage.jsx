@@ -135,7 +135,7 @@ function SearchAgencyPage() {
     }
   };
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-8">
       <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Quản Lý Đại Lý</h1>

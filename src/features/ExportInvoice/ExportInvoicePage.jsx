@@ -17,10 +17,10 @@ function ExportInvoiceListPage() {
     };
     fetchInvoices();
   }, []);
-  
+
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-10">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">
@@ -29,7 +29,7 @@ function ExportInvoiceListPage() {
 
           <button
             onClick={() => navigate("/list-export/create-export")}
-            className="h-12 px-6 rounded-xl bg-cyan-500 text-white font-bold hover:bg-cyan-600 shadow"
+            className="h-12 px-6 rounded-xl bg-cyan-500 text-white font-bold hover:bg-cyan-600 shadow cursor-pointer"
           >
             + Lập phiếu xuất
           </button>

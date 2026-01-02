@@ -9,6 +9,7 @@ import ExportInvoicePage from "../features/ExportInvoice/ExportInvoicePage";
 import CreateExportInvoicePage from "../features/ExportInvoice/CreateExportInvoicePage";
 import InvoicePage from "../features/Invoice/InvoicePage";
 import CreateInvoicePage from "../features/Invoice/CreateInvoicePage";
+import ReportListPage from "../features/Report/ReportPage";
 import EditRulesPage from "../features/EditRules/EditRulesPage";
 import Layout from "../layout/Layout";
 
@@ -66,6 +67,10 @@ const routers = [
                     {
                         path: 'list-invoice/create-invoice',
                         element: <CreateInvoicePage />
+                    },
+                    {
+                        path: 'reports',
+                        element: <ReportListPage />
                     },
                     {
                         path: 'edit-rules',

@@ -40,7 +40,7 @@ function EditRulesPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 bg-gray-50 space-y-6 min-h-full">
       <h1 className="text-3xl font-bold text-gray-800">
         Thay đổi quy định
       </h1>
@@ -54,7 +54,7 @@ function EditRulesPage() {
         {rules.map((rule) => (
           <div
             key={rule.id}
-            className="flex items-center justify-between bg-cyan-100 p-4 rounded-xl"
+            className="flex items-center justify-between bg-white shadow p-4 rounded-xl"
           >
             <div>
               <h3 className="font-semibold">

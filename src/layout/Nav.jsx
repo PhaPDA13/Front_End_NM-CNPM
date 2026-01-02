@@ -1,5 +1,4 @@
 import React from 'react';
-// Cần import NavLink từ React Router DOM
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -14,7 +13,6 @@ import {
   faSignOutAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
-// Dữ liệu cho các mục menu
 const navItems = [
   { icon: faHome, label: 'Dashboard', to: '/dashboard' },
   { icon: faUserPlus, label: 'Tiếp nhận đại lý', to: '/receive-agency' },
@@ -26,50 +24,43 @@ const navItems = [
 ];
 
 const Sidebar = () => {
-  // Hàm này xác định các class cho mục đang active và không active
-  const getNavLinkClass = ({ isActive }) =>
-    `group flex items-center p-3 rounded-xl transition-colors duration-200 
-     ${isActive
-      ? 'bg-cyan-100 text-cyan-700 font-semibold' // Active state styles
-      : 'text-gray-700 hover:bg-cyan-100' // Inactive state styles
-    }`;
-
-  // Hàm này xác định màu nền cho icon của mục đang active
-  const getIconBgClass = ({ isActive }) =>
-    `text-2xl w-8 h-8 flex items-center justify-center text-white rounded-lg transition-colors duration-200 
-     ${isActive
-      ? 'bg-cyan-600' // Active icon background
-      : 'bg-cyan-400 group-hover:bg-cyan-500' // Inactive icon background
-    }`;
-
+  const navClass = ({ isActive }) =>
+    `group flex items-center gap-4 p-3 rounded-xl transition-all
+     ${isActive ? 'bg-cyan-100 text-cyan-700 font-semibold' : 'text-gray-700 hover:bg-cyan-100'}`;
 
   return (
-    <div className="w-64 h-screen bg-white shadow-xl flex flex-col justify-between">
-
-      {/* Phần Trên: Logo và Navigation Links */}
+    <aside
+      className="
+        fixed top-0 left-0 h-screen
+        bg-white shadow-xl
+        flex flex-col justify-between
+        z-50
+        w-20 lg:w-64
+        hover:w-64
+        transition-all duration-300
+        overflow-hidden
+        group
+      "
+    >
+      {/* Logo */}
       <div>
-        <div className="flex flex-col items-center py-8">
-          {/* Thay đổi: Sử dụng Link hoặc NavLink cho logo nếu nó trỏ về trang chủ */}
-          <NavLink to="/" className="flex items-center text-cyan-500 text-3xl font-bold">
-            <span className="text-4xl mr-1">↻</span>
-            <span className="text-xl">myDMS</span>
-          </NavLink>
+        <div className="flex items-center justify-center px-4 py-6">
+          <span className="text-cyan-500 text-3xl font-bold">↻</span>
+          <span className="ml-2 text-xl font-bold text-cyan-500 hidden lg:inline group-hover:inline">
+            myDMS
+          </span>
         </div>
 
-        {/* Navigation Items - Sử dụng NavLink */}
-        <nav className="space-y-4 px-4">
-          {navItems.map((item, index) => (
-            <NavLink
-              key={index}
-              to={item.to} // Sử dụng 'to' thay vì 'href'
-              className={getNavLinkClass} // Sử dụng hàm để xác định class dựa trên isActive
-            >
-              {/* Icon */}
-              <div className={getIconBgClass}>
+        {/* Menu */}
+        <nav className="space-y-3 px-2">
+          {navItems.map((item, idx) => (
+            <NavLink key={idx} to={item.to} className={navClass}>
+              <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-cyan-500 text-white">
                 <FontAwesomeIcon icon={item.icon} />
               </div>
+
               {/* Label */}
-              <span className="ml-4 text-base">
+              <span className="whitespace-nowrap hidden lg:inline group-hover:inline">
                 {item.label}
               </span>
             </NavLink>
@@ -77,36 +68,26 @@ const Sidebar = () => {
         </nav>
       </div>
 
-      {/* Phần Dưới: Thông tin người dùng và nút Đăng xuất */}
-      <div className="p-4">
-        <div className="bg-gray-100 p-3 rounded-xl flex items-center justify-between">
-          <div className="flex items-center">
-            {/* User Icon */}
-            <div className="text-3xl w-10 h-10 flex items-center justify-center bg-cyan-400 text-white rounded-full">
+      {/* User */}
+      <div className="p-3">
+        <div className="flex items-center justify-between bg-gray-100 p-3 rounded-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-cyan-500 text-white flex items-center justify-center">
               <FontAwesomeIcon icon={faUser} />
             </div>
-            {/* User Info */}
-            <div className="ml-3">
-              <p className="text-sm font-semibold text-gray-900 leading-none">
-                Nguyễn Văn A
-              </p>
-              <p className="text-xs text-gray-500">
-                Nhân viên
-              </p>
+
+            <div className="hidden lg:block group-hover:block">
+              <p className="text-sm font-semibold">Nguyễn Văn A</p>
+              <p className="text-xs text-gray-500">Nhân viên</p>
             </div>
           </div>
 
-          {/* Logout Button (Có thể dùng Link nếu đăng xuất là một route, hoặc button nếu là hàm) */}
-          <button
-            onClick={() => console.log('Xử lý Đăng xuất')}
-            className="text-red-500 hover:text-red-700 text-xl p-1"
-            aria-label="Đăng xuất"
-          >
+          <button className="text-red-500 hover:text-red-700 hidden lg:block group-hover:block">
             <FontAwesomeIcon icon={faSignOutAlt} />
           </button>
         </div>
       </div>
-    </div>
+    </aside>
   );
 };
 
