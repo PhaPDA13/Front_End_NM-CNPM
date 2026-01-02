@@ -1,26 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import billApi from "../../services/billApi";
+import LoadingBar from "react-top-loading-bar";
 
 function ExportInvoiceListPage() {
   const [invoices, setInvoices] = useState([]);
   const navigate = useNavigate();
 
+  const loadingBarRef = useRef(null);
+
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
+        loadingBarRef.current?.continuousStart();
         const res = await billApi.getAll();
         setInvoices(res.data);
       } catch (error) {
         console.error("Lỗi tải danh sách phiếu xuất", error);
+      } finally {
+        loadingBarRef.current?.complete();
       }
     };
     fetchInvoices();
   }, []);
 
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(value);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+      <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
+
       <div className="mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">
@@ -64,17 +78,13 @@ function ExportInvoiceListPage() {
               ) : (
                 invoices.map((inv) => (
                   <tr key={inv.id} className="hover:bg-blue-50/50">
-                    <td className="px-6 py-4 font-medium">
-                      PX{inv.id}
-                    </td>
-                    <td className="px-6 py-4">
-                      {inv.agent?.name}
-                    </td>
+                    <td className="px-6 py-4 font-medium">PX{inv.id}</td>
+                    <td className="px-6 py-4">{inv.agent?.name}</td>
                     <td className="px-6 py-4">
                       {new Date(inv.issueDate).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right font-bold">
-                      {inv.totalAmount?.toLocaleString()} VNĐ
+                      {formatCurrency(inv.total)}
                     </td>
                   </tr>
                 ))

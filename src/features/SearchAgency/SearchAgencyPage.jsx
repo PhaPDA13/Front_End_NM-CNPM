@@ -33,6 +33,7 @@ function SearchAgencyPage() {
       setIsLoading(true);
       loadingBarRef.current?.continuousStart();
       const response = await axiosClient.get("/api/agents/");
+      console.log(response.data)
       setAgencies(response.data);
     } catch (error) {
       console.error("Lỗi khi tải danh sách:", error);

@@ -12,6 +12,10 @@ const agencyApi = {
   getAll: async ()=>{
     const url = '/api/agents'
     return await axiosClient.get(url)
+  },
+  get: async (id)=>{
+    const url = `/api/agents/${id}`
+    return await axiosClient.get(url)
   }
 };
 

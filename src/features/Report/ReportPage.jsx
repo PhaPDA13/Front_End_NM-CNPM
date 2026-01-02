@@ -1,187 +1,158 @@
-import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { reportSchema } from "./schema/schemaReport";
+import { useState, useEffect, useRef } from "react";
+import { toast } from "react-toastify";
+import reportApi from "../../services/reportApi";
+import LoadingBar from "react-top-loading-bar";
 
-const agencies = [
-  { id: 1, name: "Đại lý A" },
-  { id: 2, name: "Đại lý B" },
-];
+function ReportPage() {
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // Mặc định tháng hiện tại (YYYY-MM)
+  const [salesReport, setSalesReport] = useState([]);
+  const [debtReport, setDebtReport] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const loadingBarRef = useRef(null);
+  
 
-function ReportListPage() {
-  const [reports, setReports] = useState([
-    {
-      id: 1,
-      title: "Báo cáo công nợ - Đại lý A - Tháng 10/2025",
-      total: 10000000,
-    },
-  ]);
+  const MOCK_SALES = [
+    { id: 1, agentName: "Đại lý A", exportCount: 5, totalValue: 50000000, ratio: 0.5 },
+    { id: 2, agentName: "Đại lý B", exportCount: 3, totalValue: 30000000, ratio: 0.3 },
+    { id: 3, agentName: "Đại lý C", exportCount: 2, totalValue: 20000000, ratio: 0.2 },
+  ];
 
-  const [showForm, setShowForm] = useState(false);
+  const MOCK_DEBT = [
+    { id: 1, agentName: "Đại lý A", initialDebt: 1000000, incurred: 50000000, finalDebt: 51000000 },
+    { id: 2, agentName: "Đại lý B", initialDebt: 0, incurred: 30000000, finalDebt: 30000000 },
+    { id: 3, agentName: "Đại lý C", initialDebt: 5000000, incurred: 20000000, finalDebt: 25000000 },
+  ];
 
-  const {
-    handleSubmit,
-    control,
-    reset,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(reportSchema),
-  });
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        console.log(selectedMonth)
+        const res = await reportApi.getDebt(selectedMonth);
+        console.log(res)
+        setTimeout(() => {
+          setSalesReport(MOCK_SALES);
+          setDebtReport(MOCK_DEBT);
+          setLoading(false);
+        }, 500);
 
-  const onSubmit = (data) => {
-    const agent = agencies.find(
-      (a) => a.id === Number(data.agentId)
-    );
-
-    const monthText =
-      data.month.split("-")[1] +
-      "/" +
-      data.month.split("-")[0];
-
-    const newReport = {
-      id: Date.now(),
-      title: `${data.type === "DEBT"
-        ? "Báo cáo công nợ"
-        : "Báo cáo doanh số"
-        } - ${agent.name} - Tháng ${monthText}`,
-      total: Math.floor(Math.random() * 20000000) + 5000000,
+      } catch (error) {
+        console.log(error)
+        toast.error(error?.response?.data?.message|| "Lỗi tải báo cáo");
+        setLoading(false);
+      }
     };
 
-    setReports((prev) => [newReport, ...prev]);
-    reset();
-    setShowForm(false);
-  };
+    fetchData();
+  }, [selectedMonth]); 
+
+  const formatCurrency = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 
   return (
-    <div className="p-8 bg-gray-50 min-h-full">
-      <h1 className="text-3xl font-bold mb-6">
-        Báo cáo hàng tháng
-      </h1>
-
-      {/* Danh sách báo cáo */}
-      <div className="space-y-4 mb-8 w-full">
-        {reports.map((r) => (
-          <div
-            key={r.id}
-            className="flex justify-between items-center bg-white shadow p-4 rounded-xl"
-          >
-            <div>
-              <p className="font-semibold">{r.title}</p>
-              <p className="text-sm text-gray-600">
-                Tổng tiền: {r.total.toLocaleString()} VNĐ
-              </p>
-            </div>
-            <button className="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white cursor-pointer">
-              Chi tiết
-            </button>
+    <div className="min-h-screen bg-gray-50 p-6 md:p-10 font-sans">
+      <div className="mx-auto max-w-6xl space-y-8">
+        <div className="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+          <div>
+             <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Báo Cáo Doanh Số & Công Nợ</h1>
+             <p className="text-gray-500 mt-1">Tổng hợp tình hình kinh doanh theo tháng</p>
           </div>
-        ))}
+          
+          <div className="flex items-center gap-3 mt-4 md:mt-0">
+            <label className="font-semibold text-gray-700">Chọn tháng:</label>
+            <input 
+              type="month" 
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-cyan-500 outline-none font-medium text-gray-700"
+            />
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
+          <div className="p-6 border-b border-gray-100 bg-cyan-50/30 flex justify-between items-center">
+            <h2 className="text-xl font-bold text-cyan-800">1. Báo Cáo Doanh Số (BM5.1)</h2>
+            <span className="text-sm font-medium text-cyan-600 bg-white px-3 py-1 rounded-full shadow-sm">
+              Tháng {selectedMonth}
+            </span>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-100">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500 w-16">STT</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase text-gray-500">Đại Lý</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500">Số Phiếu Xuất</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500">Tổng Trị Giá</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500">Tỷ Lệ</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 bg-white">
+                {loading ? (
+                   <tr><td colSpan={5} className="text-center py-8 text-gray-400">Đang tải...</td></tr>
+                ) : salesReport.length === 0 ? (
+                   <tr><td colSpan={5} className="text-center py-8 text-gray-400 italic">Không có dữ liệu doanh số</td></tr>
+                ) : (
+                  salesReport.map((item, index) => (
+                    <tr key={item.id} className="hover:bg-cyan-50/20 transition-colors">
+                      <td className="px-6 py-4 text-center text-gray-500">{index + 1}</td>
+                      <td className="px-6 py-4 font-medium text-gray-800">{item.agentName}</td>
+                      <td className="px-6 py-4 text-center text-gray-700">{item.exportCount}</td>
+                      <td className="px-6 py-4 text-right font-bold text-gray-800">{formatCurrency(item.totalValue)}</td>
+                      <td className="px-6 py-4 text-center font-medium text-cyan-600">
+                        {(item.ratio * 100).toFixed(1)}%
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* --- REPORT 2: BÁO CÁO CÔNG NỢ (BM5.2) --- */}
+        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
+           <div className="p-6 border-b border-gray-100 bg-orange-50/30 flex justify-between items-center">
+            <h2 className="text-xl font-bold text-orange-800">2. Báo Cáo Công Nợ (BM5.2)</h2>
+             <span className="text-sm font-medium text-orange-600 bg-white px-3 py-1 rounded-full shadow-sm">
+              Tháng {selectedMonth}
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-100">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500 w-16">STT</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase text-gray-500">Đại Lý</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500">Nợ Đầu</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500">Phát Sinh</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500">Nợ Cuối</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 bg-white">
+                {loading ? (
+                   <tr><td colSpan={5} className="text-center py-8 text-gray-400">Đang tải...</td></tr>
+                ) : debtReport.length === 0 ? (
+                   <tr><td colSpan={5} className="text-center py-8 text-gray-400 italic">Không có dữ liệu công nợ</td></tr>
+                ) : (
+                  debtReport.map((item, index) => (
+                    <tr key={item.id} className="hover:bg-orange-50/20 transition-colors">
+                      <td className="px-6 py-4 text-center text-gray-500">{index + 1}</td>
+                      <td className="px-6 py-4 font-medium text-gray-800">{item.agentName}</td>
+                      <td className="px-6 py-4 text-right text-gray-600">{formatCurrency(item.initialDebt)}</td>
+                      <td className="px-6 py-4 text-right text-gray-600">{formatCurrency(item.incurred)}</td>
+                      <td className="px-6 py-4 text-right font-bold text-red-600">{formatCurrency(item.finalDebt)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
-
-      {/* Nút mở form */}
-      <div className="flex justify-end w-full mb-4">
-        <button
-          onClick={() => setShowForm(true)}
-          className="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl font-semibold cursor-pointer"
-        >
-          Lập báo cáo
-        </button>
-      </div>
-
-      {/* Form lập báo cáo */}
-      {showForm && (
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="mt-6 bg-white p-6 rounded-2xl shadow space-y-5 max-w-xl mx-auto"
-        >
-          <h2 className="text-lg font-bold">Lập báo cáo</h2>
-
-          {/* Đại lý */}
-          <div>
-            <label className="font-medium">Đại lý</label>
-            <Controller
-              name="agentId"
-              control={control}
-              render={({ field }) => (
-                <select
-                  {...field}
-                  className="w-full mt-1 p-3 border rounded-xl"
-                >
-                  <option value="">-- Chọn đại lý --</option>
-                  {agencies.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            />
-            <p className="text-red-500 text-sm">
-              {errors.agentId?.message}
-            </p>
-          </div>
-
-          {/* Tháng */}
-          <div>
-            <label className="font-medium">Tháng</label>
-            <Controller
-              name="month"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="month"
-                  className="w-full mt-1 p-3 border rounded-xl"
-                />
-              )}
-            />
-            <p className="text-red-500 text-sm">
-              {errors.month?.message}
-            </p>
-          </div>
-
-          {/* Loại báo cáo */}
-          <div>
-            <label className="font-medium">Loại báo cáo</label>
-            <Controller
-              name="type"
-              control={control}
-              render={({ field }) => (
-                <select
-                  {...field}
-                  className="w-full mt-1 p-3 border rounded-xl"
-                >
-                  <option value="">-- Chọn loại --</option>
-                  <option value="DEBT">Báo cáo công nợ</option>
-                  <option value="REVENUE">Báo cáo doanh số</option>
-                </select>
-              )}
-            />
-            <p className="text-red-500 text-sm">
-              {errors.type?.message}
-            </p>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="px-5 py-2 hover:bg-gray-100 rounded-xl border cursor-pointer"
-            >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl font-semibold cursor-pointer"
-            >
-              Lập báo cáo
-            </button>
-          </div>
-        </form>
-      )}
     </div>
   );
 }
 
-export default ReportListPage;
+export default ReportPage;

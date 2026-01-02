@@ -1,11 +1,13 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { agencySchema } from "../schema/schemaSearchAgency";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import Input from "../../../components/Input";
 import agencyApi from "../../../services/agencyApi";
 import { toast } from "react-toastify";
+import districtApi from "../../../services/districtApi";
+import agentTypeApi from "../../../services/agentTypes";
 
 const Select = ({ label, error, children, ...props }) => (
   <div className="flex flex-col w-full">
@@ -14,9 +16,7 @@ const Select = ({ label, error, children, ...props }) => (
       <select
         className={`w-full p-4 rounded-xl bg-gray-100 text-gray-800 appearance-none
           border transition duration-150 outline-none focus:ring-2 focus:ring-cyan-500/20
-          ${
-            error ? "border-red-500" : "border-gray-300 hover:border-cyan-400"
-          }`}
+          ${error ? "border-red-500" : "border-gray-300 hover:border-cyan-400"}`}
         {...props}
       >
         {children}
@@ -31,7 +31,6 @@ const Select = ({ label, error, children, ...props }) => (
   </div>
 );
 
-
 export default function UpdateAgencyModal({ open, onClose, agency, onReload }) {
   const {
     register,
@@ -40,36 +39,75 @@ export default function UpdateAgencyModal({ open, onClose, agency, onReload }) {
     reset,
   } = useForm({
     resolver: yupResolver(agencySchema),
-    defaultValues: agency,
   });
 
+  const [districts, setDistricts] = useState([]);
+  const [agentTypes, setAgentTypes] = useState([]);
+
   useEffect(() => {
-    if (agency) {
-      reset(agency);
+    const fetchMasterData = async () => {
+      try {
+        const [districtsRes, agentTypeRes] = await Promise.all([
+          districtApi.getAll(),
+          agentTypeApi.getAll(),
+        ]);
+        setDistricts(districtsRes.data || []);
+        setAgentTypes(agentTypeRes.data || []);
+      } catch (error) {
+        console.error(error);
+        toast.error("Không thể tải danh sách dữ liệu.");
+      }
+    };
+    fetchMasterData();
+  }, []);
+
+  useEffect(() => {
+    if (agency && agentTypes.length > 0 && districts.length > 0) {
+      let foundTypeId = agency.agentTypeId;
+      if (!foundTypeId && agency.agentType?.name) {
+        const foundType = agentTypes.find((t) => t.name === agency.agentType.name);
+        if (foundType) foundTypeId = foundType.id;
+      }
+
+      let foundDistrictId = agency.districtId;
+      if (!foundDistrictId && agency.district?.name) {
+        const foundDistrict = districts.find((d) => d.name === agency.district.name);
+        if (foundDistrict) foundDistrictId = foundDistrict.id;
+      }
+
+      reset({
+        ...agency,
+        agentTypeId: foundTypeId || "",
+        districtId: foundDistrictId || "",
+      });
     }
-  }, [agency, reset]);
+  }, [agency, agentTypes, districts, reset]);
 
   if (!open || !agency) return null;
 
   const onSubmit = async (data) => {
     try {
-      const {name, email, address,phone, debtAmount, districtId, agentTypeId} = data
       const payload = {
-        name, email, address, phone, debtAmount, districtId, agentTypeId
-      }
+        name: data.name,
+        email: data.email,
+        address: data.address,
+        phone: data.phone,
+        districtId: Number(data.districtId),
+        agentTypeId: Number(data.agentTypeId),
+      };
+
       await agencyApi.update(agency.id, payload);
       toast.success("Cập nhật đại lý thành công!");
-      if (onReload) {
-        onReload(); 
-      }
-      onClose(); 
+      if (onReload) onReload();
+      onClose();
     } catch (error) {
-      console.error("Lỗi cập nhật:", error);
+      console.error(error);
       toast.error(
         error.response?.data?.error?.message || "Có lỗi xảy ra khi cập nhật"
       );
     }
   };
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity">
       <div className="bg-white rounded-3xl w-[850px] max-h-[90vh] overflow-y-auto shadow-2xl transform transition-all">
@@ -121,10 +159,12 @@ export default function UpdateAgencyModal({ open, onClose, agency, onReload }) {
               label="Công nợ hiện tại (VNĐ)"
               type="number"
               placeholder="0"
-              error={errors.debtAmount} 
-              className="font-medium text-cyan-600" 
+              readOnly
+              disabled
+              className="font-medium text-cyan-600 bg-gray-50"
               {...register("debtAmount")}
             />
+
             <Select
               label="Loại đại lý"
               error={errors.agentTypeId}
@@ -133,9 +173,13 @@ export default function UpdateAgencyModal({ open, onClose, agency, onReload }) {
               <option value="" disabled>
                 -- Chọn loại --
               </option>
-              <option value="1">Loại 1</option>
-              <option value="2">Loại 2</option>
+              {agentTypes.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
             </Select>
+
             <Select
               label="Khu vực (Quận)"
               error={errors.districtId}
@@ -144,12 +188,13 @@ export default function UpdateAgencyModal({ open, onClose, agency, onReload }) {
               <option value="" disabled>
                 -- Chọn quận --
               </option>
-              {Array.from({ length: 20 }, (_, i) => (
-                <option key={i + 1} value={`${i + 1}`}>
-                  Quận {i + 1}
+              {districts.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
                 </option>
               ))}
             </Select>
+
             <div className="md:col-span-2">
               <Input
                 label="Địa chỉ chi tiết"
@@ -158,6 +203,7 @@ export default function UpdateAgencyModal({ open, onClose, agency, onReload }) {
                 {...register("address")}
               />
             </div>
+
             <div className="md:col-span-2 flex justify-end gap-4 mt-6 pt-6 border-t border-gray-100">
               <button
                 type="button"

@@ -1,19 +1,23 @@
 import { useForm, Controller } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { invoiceSchema } from "./schema/schemaInvoice";
-// import { useDispatch } from "react-redux";
-// import { addReceipt } from "./receiptSlice";
 import { useNavigate } from "react-router-dom";
 import Select from "../../components/Select";
 import Input from "../../components/Input";
 import agencyApi from "../../services/agencyApi";
+import { toast } from "react-toastify";
+import formatCurrency from "../../helper/formatCurrenry";
+import receiptApi from "../../services/receiptApi";
+import LoadingBar from "react-top-loading-bar";
 
 function CreateReceiptPage() {
   const navigate = useNavigate();
   const [agencies, setAgencies] = useState([]);
   const [debt, setDebt] = useState(0);
   const [loadingDebt, setLoadingDebt] = useState(false);
+
+  const loadingBarRef = useRef(null);
 
   const {
     control,
@@ -23,6 +27,7 @@ function CreateReceiptPage() {
     setValue,
     setError,
     clearErrors,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(invoiceSchema),
@@ -43,19 +48,24 @@ function CreateReceiptPage() {
       return;
     }
 
-    const fetchDebt = async () => {
+    const fetchAgentDetail = async () => {
       try {
         setLoadingDebt(true);
-        const res = await receiptApi.getDebt(agentId);
-        setDebt(res.data.debt);
-      } catch {
-        toast.error("Không lấy được công nợ đại lý");
+        loadingBarRef.current?.continuousStart();
+        const res = await agencyApi.get(agentId);
+        const currentDebt = res.data.debtAmount || 0;
+        setDebt(currentDebt);
+      } catch (error) {
+        console.error("Lỗi lấy chi tiết đại lý:", error);
+        toast.error("Không lấy được thông tin công nợ đại lý");
+        setDebt(0);
       } finally {
+        loadingBarRef.current.complete();
         setLoadingDebt(false);
       }
     };
 
-    fetchDebt();
+    fetchAgentDetail();
   }, [agentId, setValue]);
 
   /* ================= VALIDATE AMOUNT ================= */
@@ -74,28 +84,39 @@ function CreateReceiptPage() {
   /* ================= SUBMIT ================= */
   const onSubmit = async (data) => {
     try {
-      await receiptApi.create({
-        agentId: Number(data.agentId),
-        receiptDate: data.receiptDate,
-        amount: Number(data.amount),
-      });
-
-      toast.success("Lập phiếu thu thành công");
-      navigate("/list-invoice");
+      loadingBarRef.current?.continuousStart();
+      const response = await receiptApi.create(data);
+      console.log(response);
+      toast.success(response.message || "Lập phiếu thu thành công");
+      reset();
     } catch {
       toast.error("Có lỗi khi lập phiếu thu");
+    }
+    finally{
+      loadingBarRef.current.complete();
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-10 font-sans">
+      <LoadingBar
+        color="#06b6d4"
+        ref={loadingBarRef}
+        height={3}
+        shadow={true}
+      />
       <div className="mx-auto">
         <h1 className="mb-8 text-3xl font-bold text-gray-800 tracking-tight">
           Lập phiếu thu tiền
         </h1>
 
         <div className="rounded-3xl bg-white p-8 shadow-xl shadow-gray-200/50">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
+          <form
+            onSubmit={handleSubmit(onSubmit, (errors) =>
+              console.log("LỖI VALIDATE:", errors)
+            )}
+            className="space-y-10"
+          >
             {/* ===== THÔNG TIN CHUNG ===== */}
             <div>
               <h2 className="mb-6 text-xl font-bold text-gray-800 border-b border-gray-100 pb-2">
@@ -120,8 +141,8 @@ function CreateReceiptPage() {
                 <Input
                   type="date"
                   label="Ngày thu tiền"
-                  {...register("receiptDate")}
-                  error={errors.receiptDate}
+                  {...register("payDate")}
+                  error={errors.payDate}
                 />
               </div>
             </div>
@@ -133,15 +154,13 @@ function CreateReceiptPage() {
               </h2>
 
               <div className="rounded-2xl bg-slate-50 p-6 border border-slate-100">
-                <p className="text-sm text-gray-500 mb-2">
-                  Công nợ hiện tại
-                </p>
+                <p className="text-sm text-gray-500 mb-2">Công nợ hiện tại</p>
 
                 <p className="text-4xl font-bold text-gray-900">
-                  {loadingDebt ? "Đang tải..." : debt.toLocaleString()}
-                  <span className="ml-2 text-xl text-gray-400 font-medium">
-                    VNĐ
-                  </span>
+                  {loadingDebt
+                    ? "Đang tải..."
+                    : formatCurrency(debt.toLocaleString())}
+                  <span className="ml-2 text-xl text-gray-400 font-medium"></span>
                 </p>
               </div>
             </div>

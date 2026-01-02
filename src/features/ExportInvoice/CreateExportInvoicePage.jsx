@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { exportInvoiceSchema } from "./schema/schemaExportInvoice";
@@ -10,7 +10,7 @@ import unitsApi from "../../services/unitsApi";
 import billApi from "../../services/billApi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-
+import LoadingBar from "react-top-loading-bar";
 
 function CreateExportInvoicePage() {
   const [items, setItems] = useState([]);
@@ -25,10 +25,12 @@ function CreateExportInvoicePage() {
     quantity: "",
     price: "",
   });
+  const loadingBarRef = useRef(null);
   const [itemError, setItemError] = useState("");
   useEffect(() => {
     const fetchMasterData = async () => {
       try {
+        loadingBarRef.current?.continuousStart();
         const [agencyRes, productRes, unitRes] = await Promise.all([
           agencyApi.getAll(),
           productsApi.getAll(),
@@ -40,6 +42,8 @@ function CreateExportInvoicePage() {
         setUnits(unitRes.data);
       } catch (error) {
         console.error("Lỗi tải dữ liệu:", error);
+      } finally {
+        loadingBarRef.current?.complete();
       }
     };
     fetchMasterData();
@@ -50,6 +54,7 @@ function CreateExportInvoicePage() {
     handleSubmit,
     control,
     formState: { errors },
+    reset,
   } = useForm({
     resolver: yupResolver(exportInvoiceSchema),
     shouldUnregister: false,
@@ -125,6 +130,7 @@ function CreateExportInvoicePage() {
   };
   const onSubmitInvoice = async (data) => {
     try {
+      loadingBarRef.current?.continuousStart();
       if (items.length === 0) {
         alert("Phiếu xuất phải có ít nhất 1 mặt hàng");
         return;
@@ -143,21 +149,25 @@ function CreateExportInvoicePage() {
       };
 
       const response = await billApi.create(payload);
-      toast.success(response.message || "Tạo phiếu thành công")
+      toast.success(response.message || "Tạo phiếu thành công");
+      reset();
+      setItems([]);
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
       toast.error(
         error.response?.data?.error?.message || "Có lỗi xảy ra khi tạo đơn"
       );
+    } finally {
+      loadingBarRef.current?.complete();
     }
   };
 
   const navigate = useNavigate();
 
-
   const totalMoney = items.reduce((sum, i) => sum + i.amount, 0);
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-10 font-sans">
+      <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
       <div className="mx-auto">
         <h1 className="mb-8 text-3xl font-bold text-gray-800 tracking-tight">
           Lập phiếu xuất hàng
@@ -208,7 +218,6 @@ function CreateExportInvoicePage() {
                 )}
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-12 items-start mt-2">
-
                   <div className="md:col-span-4">
                     <Select
                       label="Sản phẩm"
@@ -219,7 +228,6 @@ function CreateExportInvoicePage() {
                       className="bg-white"
                     />
                   </div>
-
 
                   <div className="md:col-span-2">
                     <Select
@@ -237,7 +245,7 @@ function CreateExportInvoicePage() {
                       label="Số lượng"
                       type="number"
                       className="bg-white"
-                      value={currentItem.quantity || 1}
+                      value={currentItem.quantity}
                       onChange={(e) =>
                         setCurrentItem({
                           ...currentItem,
@@ -378,7 +386,6 @@ function CreateExportInvoicePage() {
                 >
                   Quay lại
                 </button>
-
 
                 <button
                   type="submit"

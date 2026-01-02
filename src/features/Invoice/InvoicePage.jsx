@@ -1,25 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import receiptApi from "../../services/billApi";
+import formatCurrency from "../../helper/formatCurrenry";
+import LoadingBar from "react-top-loading-bar";
 
 function ReceiptInvoiceListPage() {
   const [receipts, setReceipts] = useState([]);
   const navigate = useNavigate();
+  const loadingBarRef = useRef(null);
 
   useEffect(() => {
     const fetchReceipts = async () => {
       try {
+      loadingBarRef.current?.continuousStart();
+
         const res = await receiptApi.getAll();
         setReceipts(res.data);
       } catch (error) {
         console.error("Lỗi tải danh sách phiếu thu", error);
       }
+      finally{
+      loadingBarRef.current?.complete();
+
+      }
     };
     fetchReceipts();
   }, []);
+  
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+      <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
+
       <div className="mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -72,10 +84,10 @@ function ReceiptInvoiceListPage() {
                       {r.agent?.name}
                     </td>
                     <td className="px-6 py-4">
-                      {new Date(r.receiptDate).toLocaleDateString()}
+                      {new Date(r.issueDate).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right font-bold">
-                      {r.amount.toLocaleString()} VNĐ
+                      {formatCurrency(r.total.toLocaleString())}
                     </td>
                   </tr>
                 ))

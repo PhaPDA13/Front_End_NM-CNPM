@@ -1,7 +1,7 @@
 import axiosClient from "./axiosClient";
 
 const districtApi = {
-    get:async ()=>{
+    getAll:async ()=>{
         const url = '/api/districts';
         return await axiosClient.get(url)
     },

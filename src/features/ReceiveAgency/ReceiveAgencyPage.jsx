@@ -4,28 +4,60 @@ import Input from "../../components/Input";
 import { receiveAgentSchema } from "./schema/schemaReceiveAgency.js";
 import agencyApi from "../../services/agencyApi.js";
 import { toast } from "react-toastify";
+import { useEffect, useRef, useState } from "react";
+import districtApi from "../../services/districtApi.js";
+import agentTypeApi from "../../services/agentTypes.js";
+import LoadingBar from "react-top-loading-bar";
 
 function ReceiveAgentPage() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm({
-    resolver: yupResolver(receiveAgentSchema)
+    resolver: yupResolver(receiveAgentSchema),
   });
 
   const onSubmit = async (data) => {
     try {
-      const response = await agencyApi.create(data)
-      toast.success("Create agent")
-      reset()
+      loadingBarRef.current?.continuousStart();
+      const response = await agencyApi.create(data);
+      toast.success("Create agent");
+      reset();
     } catch (error) {
-      toast.error(error?.response?.data?.error?.message ?? "Failed")
+      toast.error(error?.response?.data?.error?.message ?? "Failed");
+    } finally {
+      loadingBarRef.current?.complete();
     }
   };
+  const loadingBarRef = useRef(null);
+  
+  const [districts, setDistricts] = useState([]);
+  const [agentType, setAgentType] = useState([]);
+
+  useEffect(() => {
+    const fetchMasterData = async () => {
+      try {
+        const [districts, agentType] = await Promise.all([
+          districtApi.getAll(),
+          agentTypeApi.getAll(),
+        ]);
+        setDistricts(districts.data || []);
+        setAgentType(agentType.data || []);
+      } catch (error) {
+        console.error("Lỗi tải dữ liệu ban đầu:", error);
+        // Có thể toast lỗi ở đây
+        alert("Không thể tải danh sách dữ liệu. Vui lòng tải lại trang.");
+      }
+    };
+
+    fetchMasterData();
+  }, []);
+
   return (
     <div className="p-8 bg-gray-50 min-h-full">
+      <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">
@@ -66,8 +98,17 @@ function ReceiveAgentPage() {
             ${errors.type ? "border-red-500" : "border-gray-300"}`}
             >
               <option value="">Chọn loại</option>
-              <option value="1">Loại 1</option>
-              <option value="2">Loại 2</option>
+              {agentType.length > 0 && (
+                <>
+                  {agentType.map((item, i) => {
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </>
+              )}
             </select>
             {errors.agentTypeId && (
               <p className="text-red-500 text-sm mt-1">
@@ -86,9 +127,7 @@ function ReceiveAgentPage() {
 
           {/* Quận */}
           <div className="flex flex-col w-full">
-            <label className="mb-1 font-medium text-gray-700">
-              Quận
-            </label>
+            <label className="mb-1 font-medium text-gray-700">Quận</label>
             <select
               defaultValue=""
               {...register("districtId")}
@@ -99,11 +138,17 @@ function ReceiveAgentPage() {
               <option value="" disabled>
                 Chọn Quận
               </option>
-              {Array.from({ length: 20 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  Quận {i + 1}
-                </option>
-              ))}
+              {districts.length > 0 && (
+                <>
+                  {districts.map((item, i) => {
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </>
+              )}
             </select>
             {errors.districtId && (
               <p className="text-red-500 text-sm mt-1">
