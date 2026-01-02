@@ -10,13 +10,13 @@ function App() {
   const element = useRoutes(routers)
   const { isLoading, error } = useSelector((state) => state.auth);
   const loadingBarRef = useRef(null);
-  const {mode} = useSelector((state)=>state.theme)
+  const { mode } = useSelector((state) => state.theme)
   console.log(mode)
   useEffect(() => {
     if (isLoading) {
-      loadingBarRef.current.continuousStart(); 
+      loadingBarRef.current.continuousStart();
     } else {
-      loadingBarRef.current.complete(); 
+      loadingBarRef.current.complete();
     }
   }, [isLoading]);
 
@@ -29,11 +29,11 @@ function App() {
       root.classList.remove("dark");
       root.classList.add("light");
     }
-}, [mode]);
-  
+  }, [mode]);
+
   return (
     <>
-       <LoadingBar color='#06b6d4' ref={loadingBarRef} height={3} />
+      <LoadingBar color='#06b6d4' ref={loadingBarRef} height={3} />
       {element}
       <ToastContainer position="top-right" autoClose={3000} />
     </>

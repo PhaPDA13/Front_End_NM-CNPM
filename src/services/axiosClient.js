@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 let accessToken = null;
 
@@ -7,13 +7,12 @@ export const setAccessToken = (token) => {
 };
 
 const axiosClient = axios.create({
-  baseURL: 'http://localhost:3000/user',
+  baseURL: "http://localhost:3000/user",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
-  withCredentials: true, 
+  withCredentials: true,
 });
-
 
 axiosClient.interceptors.request.use(
   (config) => {
@@ -29,7 +28,7 @@ axiosClient.interceptors.request.use(
 
 axiosClient.interceptors.response.use(
   (response) => {
-    return response.data; 
+    return response.data;
   },
   (error) => {
     // Xử lý lỗi chung (VD: Token hết hạn 401 thì gọi refresh token)
