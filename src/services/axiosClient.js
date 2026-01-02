@@ -52,7 +52,6 @@ axiosClient.interceptors.response.use(
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
         return axiosClient(originalRequest);
       } catch (refreshError) {
-        console.log("vo day")
         store.dispatch(logout());
         return Promise.reject(refreshError);
       }

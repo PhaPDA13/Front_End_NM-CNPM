@@ -1,13 +1,17 @@
 import axiosClient from "./axiosClient";
 
 const agencyApi = {
-  update: (id, data) => {
+  update: async (id, data) => {
     const url = `/api/agents/${id}`; 
-    return axiosClient.put(url, data); 
+    return await axiosClient.put(url, data); 
   },
-  create: (data)=>{
+  create: async (data)=>{
     const url = '/api/agents/';
-    return axiosClient.post(url, data)
+    return await axiosClient.post(url, data)
+  },
+  getAll: async ()=>{
+    const url = '/api/agents'
+    return await axiosClient.get(url)
   }
 };
 
