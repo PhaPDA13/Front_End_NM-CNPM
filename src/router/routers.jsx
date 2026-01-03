@@ -16,87 +16,77 @@ import CreateProductPage from "../features/Products/CreateProductPage";
 import UnitsPage from "../features/Units/UnitsPage";
 import Layout from "../layout/Layout";
 
-
 const routers = [
-    {
-        element: <PublicRoute />,
+  {
+    element: <PublicRoute />,
+    children: [
+      {
+        path: "/signin",
+        element: <SignIn />,
+      },
+      {
+        path: "/signup",
+        element: <SignUp />,
+      },
+    ],
+  },
+
+  {
+    path: "/",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <Layout />,
         children: [
-            {
-                path: '/signin',
-                element: <SignIn />
-            },
-            {
-                path: '/signup',
-                element: <SignUp />
-            }
-        ]
-    },
+          {
+            index: true,
+            element: <DashBoard />,
+          },
+          {
+            path: "dashboard",
+            element: <DashBoard />,
+          },
+          {
+            path: "receive-agency",
+            element: <ReceiveAgencyPage />,
+          },
+          {
+            path: "search-agency",
+            element: <SearchAgencyPage />,
+          },
+          {
+            path: "list-export",
+            element: <ExportInvoicePage />,
+          },
+          {
+            path: "list-export/create-export",
+            element: <CreateExportInvoicePage />,
+          },
+          {
+            path: "list-invoice",
+            element: <InvoicePage />,
+          },
+          {
+            path: "list-invoice/create-invoice",
+            element: <CreateInvoicePage />,
+          },
+          {
+            path: "reports",
+            element: <ReportListPage />,
+          },
+          {
+            path: "edit-rules",
+            element: <EditRulesPage />,
+          },
 
-    {
-        path: '/',
-        element: <ProtectedRoute />,
-        children: [
-            {
-                element: <Layout />,
-                children: [
-                    {
-                        index: true,
-                        element: <DashBoard />
-                    },
-                    {
-                        path: 'dashboard',
-                        element: <DashBoard />
-                    },
-                    {
-                        path: 'receive-agency',
-                        element: <ReceiveAgencyPage />
-                    },
-                    {
-                        path: 'search-agency',
-                        element: <SearchAgencyPage />
-                    },
-                    {
-                        path: 'list-export',
-                        element: <ExportInvoicePage />
-                    },
-                    {
-                        path: 'list-export/create-export',
-                        element: <CreateExportInvoicePage />
-                    },
-                    {
-                        path: 'list-invoice',
-                        element: <InvoicePage />
-                    },
-                    {
-                        path: 'list-invoice/create-invoice',
-                        element: <CreateInvoicePage />
-                    },
-                    {
-                        path: 'reports',
-                        element: <ReportListPage />
-                    },
-                    {
-                        path: 'edit-rules',
-                        element: <EditRulesPage />
-                    },
-                    {
-                        path: 'list-products',
-                        element: <ProductsPage />
-                    },
-                    {
-                        path: 'list-products/create-product',
-                        element: <CreateProductPage />
-                    },
-                    {
-                        path: 'list-units',
-                        element: <UnitsPage />
-                    },
-                ]
-            }
-        ]
-    },
-
-
+          {
+            path: "list-products/create-product",
+            element: <CreateProductPage />,
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export default routers;
