@@ -11,8 +11,8 @@ export const receiveAgentSchema = yup.object({
 
   phone: yup
     .string()
-    .matches(/^[0-9]{9,11}$/, "Số điện thoại không hợp lệ")
-    .required("Vui lòng nhập số điện thoại"),
+    .required("Vui lòng nhập số điện thoại")
+    .matches(/^[0-9]{9,11}$/, "Số điện thoại không hợp lệ"),
 
   districtId: yup
     .string()

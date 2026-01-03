@@ -27,5 +27,14 @@ export const schema = yup.object({
   confirmPassword: yup
     .string()
     .required("Vui lòng xác nhận mật khẩu")
-    .oneOf([yup.ref("password"), null], "Xác nhận mật khẩu không khớp"),
+    .when("password", {
+      is: (val) => val && val.length > 0,
+      then: (schema) =>
+        schema.oneOf(
+          [yup.ref("password")],
+          "Xác nhận mật khẩu không khớp"
+        ),
+    }),
+
+
 });
