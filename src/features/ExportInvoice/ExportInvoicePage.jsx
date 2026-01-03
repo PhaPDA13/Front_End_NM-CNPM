@@ -2,9 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import billApi from "../../services/billApi";
 import LoadingBar from "react-top-loading-bar";
+import Pagination from "../SearchAgency/Components/Pagination";
+import { FaSearch } from "react-icons/fa";
 
 function ExportInvoiceListPage() {
   const [invoices, setInvoices] = useState([]);
+  const [filteredInvoices, setFilteredInvoices] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const navigate = useNavigate();
 
   const loadingBarRef = useRef(null);
@@ -15,6 +21,7 @@ function ExportInvoiceListPage() {
         loadingBarRef.current?.continuousStart();
         const res = await billApi.getAll();
         setInvoices(res.data);
+        setFilteredInvoices(res.data);
       } catch (error) {
         console.error("Lỗi tải danh sách phiếu xuất", error);
       } finally {
@@ -24,11 +31,32 @@ function ExportInvoiceListPage() {
     fetchInvoices();
   }, []);
 
+  useEffect(() => {
+    const filtered = invoices.filter((inv) => {
+      const matchId = inv.id?.toString().includes(searchTerm);
+      const matchAgent = inv.agent?.name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      return matchId || matchAgent;
+    });
+    setFilteredInvoices(filtered);
+    setCurrentPage(1);
+  }, [searchTerm, invoices]);
+
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(value);
+  };
+
+  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentInvoices = filteredInvoices.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -47,6 +75,19 @@ function ExportInvoiceListPage() {
           >
             + Lập phiếu xuất
           </button>
+        </div>
+
+        <div className="mb-6 bg-white rounded-xl p-4 shadow">
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo mã phiếu hoặc tên đại lý..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+            />
+          </div>
         </div>
 
         <div className="rounded-2xl bg-white shadow overflow-hidden">
@@ -69,14 +110,16 @@ function ExportInvoiceListPage() {
             </thead>
 
             <tbody className="divide-y divide-gray-100 bg-white">
-              {invoices.length === 0 ? (
+              {currentInvoices.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-10 text-center text-gray-400">
-                    Chưa có phiếu xuất nào
+                    {searchTerm
+                      ? "Không tìm thấy kết quả phù hợp"
+                      : "Chưa có phiếu xuất nào"}
                   </td>
                 </tr>
               ) : (
-                invoices.map((inv) => (
+                currentInvoices.map((inv) => (
                   <tr key={inv.id} className="hover:bg-blue-50/50">
                     <td className="px-6 py-4 font-medium">PX{inv.id}</td>
                     <td className="px-6 py-4">{inv.agent?.name}</td>
@@ -91,6 +134,16 @@ function ExportInvoiceListPage() {
               )}
             </tbody>
           </table>
+
+          {filteredInvoices.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              totalItems={filteredInvoices.length}
+              currentCount={currentInvoices.length}
+            />
+          )}
         </div>
       </div>
     </div>
