@@ -57,13 +57,13 @@ function ReceiptInvoiceListPage() {
   
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 transition-colors duration-300">
       <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
 
       <div className="mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
             Danh sách phiếu thu tiền
           </h1>
 
@@ -75,7 +75,7 @@ function ReceiptInvoiceListPage() {
           </button>
         </div>
 
-        <div className="mb-6 bg-white rounded-xl p-4 shadow">
+        <div className="mb-6 bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
           <div className="relative">
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
@@ -83,32 +83,32 @@ function ReceiptInvoiceListPage() {
               placeholder="Tìm kiếm theo mã phiếu hoặc tên đại lý..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
         </div>
 
         {/* Table */}
-        <div className="rounded-2xl bg-white shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-100">
-            <thead className="bg-gray-50">
+        <div className="rounded-2xl bg-white dark:bg-gray-800 shadow overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300">
                   Mã phiếu
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300">
                   Đại lý
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300">
                   Ngày thu
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500">
+                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-300">
                   Số tiền
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100 bg-white">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
               {currentReceipts.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-10 text-center text-gray-400">
@@ -119,17 +119,17 @@ function ReceiptInvoiceListPage() {
                 </tr>
               ) : (
                 currentReceipts.map((r) => (
-                  <tr key={r.id} className="hover:bg-blue-50/50">
-                    <td className="px-6 py-4 font-medium">
+                  <tr key={r.id} className="hover:bg-blue-50/50 dark:hover:bg-blue-900/20">
+                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                       PT{r.id}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 text-gray-700 dark:text-gray-300">
                       {r.agent?.name}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 text-gray-700 dark:text-gray-300">
                       {new Date(r.issueDate).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 text-right font-bold">
+                    <td className="px-6 py-4 text-right font-bold text-gray-900 dark:text-white">
                       {formatCurrency(r.total.toLocaleString())}
                     </td>
                   </tr>

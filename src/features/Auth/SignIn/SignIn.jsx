@@ -52,10 +52,10 @@ const SignInPage = () => {
         </div>
       </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white dark:bg-gray-900">
         <div className="max-w-md w-full">
           
-          <h2 className="text-4xl font-bold text-cyan-700 mb-8 text-center lg:text-left">
+          <h2 className="text-4xl font-bold text-cyan-700 dark:text-cyan-400 mb-8 text-center lg:text-left">
             Đăng nhập
           </h2>
 
@@ -75,7 +75,7 @@ const SignInPage = () => {
             />
             
             <div className="text-right pt-2">
-                <Link to="/forgot-password" className="text-gray-600 hover:text-cyan-600 transition duration-150 text-base font-medium">
+                <Link to="/forgot-password" className="text-gray-600 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition duration-150 text-base font-medium">
                     Quên mật khẩu?
                 </Link>
             </div>

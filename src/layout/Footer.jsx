@@ -13,7 +13,7 @@ import {
 const Footer = () => {
   return (
     // Toàn bộ footer: Màu nền xanh (cyan), padding, vị trí tương đối
-    <footer className="bg-cyan-500 pt-4 pb-3 text-white relative overflow-hidden">
+    <footer className="bg-cyan-500 dark:bg-gray-800 pt-4 pb-3 text-white relative overflow-hidden">
       {/* Thanh Bottom Bar (Copyright và Policies) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 flex flex-col md:flex-row justify-between items-center text-sm">
 

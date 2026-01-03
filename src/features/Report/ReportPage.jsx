@@ -159,38 +159,38 @@ function ReportPage() {
 
 
   return (
-    <div className=" md:p-10 font-sans p-8 bg-gray-50 min-h-full">
+    <div className=" md:p-10 font-sans p-8 bg-gray-50 dark:bg-gray-900 min-h-full transition-colors duration-300">
       <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
       <div className="mx-auto max-w-6xl space-y-8">
         
         <div>
-           <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
+           <h1 className="text-3xl font-bold text-gray-800 dark:text-white tracking-tight">
              Báo Cáo Doanh Số & Công Nợ
            </h1>
-           <p className="text-gray-500 mt-1">
+           <p className="text-gray-500 dark:text-gray-400 mt-1">
              Tổng hợp tình hình kinh doanh chi tiết
            </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-gray-900/50 overflow-hidden border border-gray-100 dark:border-gray-700">
           {/* Header Card Sales */}
-          <div className="p-6 border-b border-gray-100 bg-cyan-50/30 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-cyan-50/30 dark:bg-cyan-900/20 flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-cyan-800">
+                <h2 className="text-xl font-bold text-cyan-800 dark:text-cyan-300">
                 1. Báo Cáo Doanh Số (BM5.1)
                 </h2>
-                <span className="text-xs font-semibold text-cyan-600 bg-white px-2 py-1 rounded border border-cyan-100">
+                <span className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 bg-white dark:bg-gray-700 px-2 py-1 rounded border border-cyan-100 dark:border-cyan-800">
                     {filteredSalesData.length} bản ghi
                 </span>
             </div>
             
             <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-600">Tháng:</label>
+                <label className="text-sm font-medium text-gray-600 dark:text-gray-300">Tháng:</label>
                 <input
                     type="month"
                     value={salesMonth}
                     onChange={(e) => setSalesMonth(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-cyan-500 outline-none bg-white text-gray-700 shadow-sm"
+                    className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-cyan-500 outline-none bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm"
                 />
                 <button
                     onClick={exportSalesPDF}
@@ -202,7 +202,7 @@ function ReportPage() {
             </div>
           </div>
 
-          <div className="p-4 border-b border-gray-100">
+          <div className="p-4 border-b border-gray-100 dark:border-gray-700">
             <div className="relative">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
@@ -210,23 +210,23 @@ function ReportPage() {
                 placeholder="Tìm kiếm theo tên đại lý..."
                 value={salesSearchTerm}
                 onChange={(e) => setSalesSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-100">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500 w-16">STT</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase text-gray-500">Đại Lý</th>
-                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500">Số Phiếu Xuất</th>
-                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500">Tổng Trị Giá</th>
-                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500">Tỷ Lệ</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500 dark:text-gray-300 w-16">STT</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase text-gray-500 dark:text-gray-300">Đại Lý</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500 dark:text-gray-300">Số Phiếu Xuất</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500 dark:text-gray-300">Tổng Trị Giá</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500 dark:text-gray-300">Tỷ Lệ</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 bg-white">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
                 {loadingSales ? (
                   <tr>
                     <td colSpan={5} className="text-center py-8 text-gray-400">Đang tải dữ liệu...</td>
@@ -237,14 +237,14 @@ function ReportPage() {
                   </tr>
                 ) : (
                   currentSalesData.map((item, index) => (
-                    <tr key={index} className="hover:bg-cyan-50/20 transition-colors">
-                      <td className="px-6 py-4 text-center text-gray-500">
+                    <tr key={index} className="hover:bg-cyan-50/20 dark:hover:bg-cyan-900/20 transition-colors">
+                      <td className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                         {(salesPage - 1) * ITEMS_PER_PAGE + index + 1}
                       </td>
-                      <td className="px-6 py-4 font-medium text-gray-800">{item.agentName}</td>
-                      <td className="px-6 py-4 text-center text-gray-700">{item.billCount}</td>
-                      <td className="px-6 py-4 text-right font-bold text-gray-800">{formatCurrency(item.totalRevenue)}</td>
-                      <td className="px-6 py-4 text-center font-medium text-cyan-600">{(item.percentage)}%</td>
+                      <td className="px-6 py-4 font-medium text-gray-800 dark:text-white">{item.agentName}</td>
+                      <td className="px-6 py-4 text-center text-gray-700 dark:text-gray-300">{item.billCount}</td>
+                      <td className="px-6 py-4 text-right font-bold text-gray-800 dark:text-white">{formatCurrency(item.totalRevenue)}</td>
+                      <td className="px-6 py-4 text-center font-medium text-cyan-600 dark:text-cyan-400">{(item.percentage)}%</td>
                     </tr>
                   ))
                 )}
@@ -265,25 +265,25 @@ function ReportPage() {
         </div>
 
         {/* ================= 2. BÁO CÁO CÔNG NỢ ================= */}
-        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-gray-900/50 overflow-hidden border border-gray-100 dark:border-gray-700">
           {/* Header Card Debt */}
-          <div className="p-6 border-b border-gray-100 bg-orange-50/30 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-orange-50/30 dark:bg-orange-900/20 flex flex-col md:flex-row justify-between items-center gap-4">
              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-orange-800">
+                <h2 className="text-xl font-bold text-orange-800 dark:text-orange-300">
                 2. Báo Cáo Công Nợ (BM5.2)
                 </h2>
-                <span className="text-xs font-semibold text-orange-600 bg-white px-2 py-1 rounded border border-orange-100">
+                <span className="text-xs font-semibold text-orange-600 dark:text-orange-400 bg-white dark:bg-gray-700 px-2 py-1 rounded border border-orange-100 dark:border-orange-800">
                     {filteredDebtData.length} bản ghi
                 </span>
             </div>
 
             <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-600">Tháng:</label>
+                <label className="text-sm font-medium text-gray-600 dark:text-gray-300">Tháng:</label>
                 <input
                     type="month"
                     value={debtMonth}
                     onChange={(e) => setDebtMonth(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none bg-white text-gray-700 shadow-sm"
+                    className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm"
                 />
                 <button
                     onClick={exportDebtPDF}
@@ -295,7 +295,7 @@ function ReportPage() {
             </div>
           </div>
 
-          <div className="p-4 border-b border-gray-100">
+          <div className="p-4 border-b border-gray-100 dark:border-gray-700">
             <div className="relative">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
@@ -303,23 +303,23 @@ function ReportPage() {
                 placeholder="Tìm kiếm theo tên đại lý..."
                 value={debtSearchTerm}
                 onChange={(e) => setDebtSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-100">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500 w-16">STT</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase text-gray-500">Đại Lý</th>
-                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500">Nợ Đầu</th>
-                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500">Phát Sinh</th>
-                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500">Nợ Cuối</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold uppercase text-gray-500 dark:text-gray-300 w-16">STT</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase text-gray-500 dark:text-gray-300">Đại Lý</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500 dark:text-gray-300">Nợ Đầu</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500 dark:text-gray-300">Phát Sinh</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold uppercase text-gray-500 dark:text-gray-300">Nợ Cuối</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 bg-white">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
                 {loadingDebt ? (
                   <tr>
                     <td colSpan={5} className="text-center py-8 text-gray-400">Đang tải dữ liệu...</td>
@@ -330,14 +330,14 @@ function ReportPage() {
                   </tr>
                 ) : (
                   currentDebtData.map((item, index) => (
-                    <tr key={index} className="hover:bg-orange-50/20 transition-colors">
-                      <td className="px-6 py-4 text-center text-gray-500">
+                    <tr key={index} className="hover:bg-orange-50/20 dark:hover:bg-orange-900/20 transition-colors">
+                      <td className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                         {(debtPage - 1) * ITEMS_PER_PAGE + index + 1}
                       </td>
-                      <td className="px-6 py-4 font-medium text-gray-800">{item.agentName}</td>
-                      <td className="px-6 py-4 text-right text-gray-600">{formatCurrency(item.beginningDebt)}</td>
-                      <td className="px-6 py-4 text-right text-gray-600">{formatCurrency(item.issuedDebt)}</td>
-                      <td className="px-6 py-4 text-right font-bold text-red-600">{formatCurrency(item.endingDebt)}</td>
+                      <td className="px-6 py-4 font-medium text-gray-800 dark:text-white">{item.agentName}</td>
+                      <td className="px-6 py-4 text-right text-gray-600 dark:text-gray-300">{formatCurrency(item.beginningDebt)}</td>
+                      <td className="px-6 py-4 text-right text-gray-600 dark:text-gray-300">{formatCurrency(item.issuedDebt)}</td>
+                      <td className="px-6 py-4 text-right font-bold text-red-600 dark:text-red-400">{formatCurrency(item.endingDebt)}</td>
                     </tr>
                   ))
                 )}

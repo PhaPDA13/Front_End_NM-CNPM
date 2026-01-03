@@ -119,14 +119,15 @@ const DashboardPage = () => {
       if (topDealersRes.data && Array.isArray(topDealersRes.data)) {
         formattedTopDealers = topDealersRes.data.slice(0, 5).map((dealer, index) => ({
           name: dealer.name || `Đại lý ${index + 1}`,
-          location: `Loại ${index + 1}`,
-          doanhSo: `${(dealer.totalRevenue / 1000000).toFixed(1)}M VNĐ`,
-          congNo: '0M',
+          location: `${dealer.district || 'N/A'} - ${dealer.agentType || 'N/A'}`,
+          doanhSo: `${(parseFloat(dealer.revenue || 0) / 1000000).toFixed(1)}M VNĐ`,
+          congNo: `${(parseFloat(dealer.debtAmount || 0) / 1000000).toFixed(1)}M`,
+          orderCount: dealer.orderCount || 0,
           isTop: index === 0
         }));
       }
       setTopDealers(formattedTopDealers.length > 0 ? formattedTopDealers : [
-        { name: 'Chưa có dữ liệu', location: 'N/A', doanhSo: '0M VNĐ', congNo: '0M', isTop: false }
+        { name: 'Chưa có dữ liệu', location: 'N/A', doanhSo: '0M VNĐ', congNo: '0M', orderCount: 0, isTop: false }
       ]);
 
 
@@ -167,8 +168,7 @@ const DashboardPage = () => {
       const monthlyBillsDiff = currentMonthBills.length - prevMonthBillsCount;
 
 
-      console.log(currentTotalDebt)
-      console.log(prevTotalDebt)
+      console.log(topDealers)
 
       // --- 6. Helper & Set State ---
       const formatDiff = (diff, unit = '') => {
@@ -259,10 +259,10 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="flex-1 h-full bg-gray-50 overflow-y-auto">
+    <div className="flex-1 h-full bg-gray-50 dark:bg-gray-900 overflow-y-auto transition-colors duration-300">
       <main className="p-8">
         <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">Tổng quan hệ thống</h1>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-8">Tổng quan hệ thống</h1>
 
         {/* 1. Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -279,8 +279,8 @@ const DashboardPage = () => {
 
         {/* 2. Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-white p-6 rounded-2xl shadow-lg">
-            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
               <FontAwesomeIcon icon={faChartLine} className="text-cyan-500 mr-2" />
               Doanh số & Công nợ theo tháng
             </h2>
@@ -300,8 +300,8 @@ const DashboardPage = () => {
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-lg">
-            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
               <FontAwesomeIcon icon={faChartPie} className="text-purple-500 mr-2" />
               Phân loại đại lý
             </h2>
@@ -311,8 +311,8 @@ const DashboardPage = () => {
                   <div key={index} className="flex items-center">
                     <div className="w-4 h-4 rounded mr-2" style={{ backgroundColor: item.color }}></div>
                     <div className="text-sm">
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-gray-600">{item.value} đại lý</div>
+                      <div className="font-medium text-gray-900 dark:text-white">{item.name}</div>
+                      <div className="text-gray-600 dark:text-gray-400">{item.value} đại lý</div>
                     </div>
                   </div>
                 ))}
@@ -343,8 +343,8 @@ const DashboardPage = () => {
         </div>
 
         {/* 3. Top Dealers */}
-        <div className="bg-white p-6 rounded-2xl shadow-lg">
-          <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
             <FontAwesomeIcon icon={faStar} className="text-yellow-500 mr-2" />
             TOP 5 ĐẠI LÝ THEO DOANH SỐ
           </h2>

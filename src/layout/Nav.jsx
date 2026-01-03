@@ -9,10 +9,6 @@ import {
   faFileInvoiceDollar,
   faChartPie,
   faEdit,
-  faUser,
-  faSignOutAlt,
-  faBox,
-  faBalanceScale,
 } from '@fortawesome/free-solid-svg-icons';
 
 const navItems = [
@@ -28,13 +24,15 @@ const navItems = [
 const Sidebar = () => {
   const navClass = ({ isActive }) =>
     `group flex items-center gap-4 p-3 rounded-xl transition-all
-     ${isActive ? 'bg-cyan-100 text-cyan-700 font-semibold' : 'text-gray-700 hover:bg-cyan-100'}`;
+     ${isActive 
+       ? 'bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300 font-semibold' 
+       : 'text-gray-700 dark:text-gray-300 hover:bg-cyan-100 dark:hover:bg-gray-700'}`;
 
   return (
     <aside
       className="
         fixed top-0 left-0 h-screen
-        bg-white shadow-xl
+        bg-white dark:bg-gray-800 shadow-xl
         flex flex-col justify-between
         z-50
         w-20 lg:w-64
@@ -47,8 +45,8 @@ const Sidebar = () => {
       {/* Logo */}
       <div>
         <div className="flex items-center justify-center px-4 py-6">
-          <span className="text-cyan-500 text-3xl font-bold">↻</span>
-          <span className="ml-2 text-xl font-bold text-cyan-500 hidden lg:inline group-hover:inline">
+          <span className="text-cyan-500 dark:text-cyan-400 text-3xl font-bold">↻</span>
+          <span className="ml-2 text-xl font-bold text-cyan-500 dark:text-cyan-400 hidden lg:inline group-hover:inline">
             myDMS
           </span>
         </div>
@@ -68,26 +66,6 @@ const Sidebar = () => {
             </NavLink>
           ))}
         </nav>
-      </div>
-
-      {/* User */}
-      <div className="p-3">
-        <div className="flex items-center justify-between bg-gray-100 p-3 rounded-xl">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-cyan-500 text-white flex items-center justify-center">
-              <FontAwesomeIcon icon={faUser} />
-            </div>
-
-            <div className="hidden lg:block group-hover:block">
-              <p className="text-sm font-semibold">Nguyễn Văn A</p>
-              <p className="text-xs text-gray-500">Nhân viên</p>
-            </div>
-          </div>
-
-          <button className="text-red-500 hover:text-red-700 hidden lg:block group-hover:block">
-            <FontAwesomeIcon icon={faSignOutAlt} />
-          </button>
-        </div>
       </div>
     </aside>
   );

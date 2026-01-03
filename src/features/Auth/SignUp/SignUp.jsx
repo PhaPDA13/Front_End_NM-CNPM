@@ -32,9 +32,9 @@ const SignUp = () => {
 
   return (
     <div className="flex h-screen w-full font-sans">
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white dark:bg-gray-900">
         <div className="max-w-md w-full">
-          <h2 className="text-4xl font-bold text-cyan-700 mb-8">Đăng ký</h2>
+          <h2 className="text-4xl font-bold text-cyan-700 dark:text-cyan-400 mb-8">Đăng ký</h2>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-6 flex flex-col"

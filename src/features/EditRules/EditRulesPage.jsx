@@ -218,18 +218,18 @@ function EditRulesPage() {
   const totalPages = (array) => Math.ceil(array.length / itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 transition-colors duration-300">
       <LoadingBar color="#06b6d4" ref={loadingBarRef} />
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Thay đổi quy định</h1>
+      <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-8">Thay đổi quy định</h1>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200 mb-6">
+      <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700 mb-6">
         <button
           onClick={() => setActiveTab(1)}
           className={`px-6 py-3 font-semibold transition-colors ${
             activeTab === 1
-              ? "border-b-2 border-cyan-500 text-cyan-600"
-              : "text-gray-600 hover:text-gray-800"
+              ? "border-b-2 border-cyan-500 text-cyan-600 dark:text-cyan-400"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
           }`}
         >
           Quy định 1
@@ -238,8 +238,8 @@ function EditRulesPage() {
           onClick={() => setActiveTab(2)}
           className={`px-6 py-3 font-semibold transition-colors ${
             activeTab === 2
-              ? "border-b-2 border-cyan-500 text-cyan-600"
-              : "text-gray-600 hover:text-gray-800"
+              ? "border-b-2 border-cyan-500 text-cyan-600 dark:text-cyan-400"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
           }`}
         >
           Quy định 2
@@ -250,9 +250,9 @@ function EditRulesPage() {
       {activeTab === 1 && (
         <div className="space-y-6">
           {/* Districts Table */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800">Danh sách quận và số lượng đại lý tối đa</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Danh sách quận và số lượng đại lý tối đa</h2>
               <button
                 onClick={() => setShowAddDistrictModal(true)}
                 className="px-6 py-2.5 bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl font-semibold shadow-md transition duration-200"
@@ -261,35 +261,35 @@ function EditRulesPage() {
               </button>
             </div>
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Tên quận</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Số đại lý tối đa</th>
-                  <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Thao tác</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Tên quận</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Số đại lý tối đa</th>
+                  <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {paginate(districts, currentPageDistricts).map((district) => (
-                  <tr key={district.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-gray-800">
+                  <tr key={district.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td className="px-6 py-4 text-gray-800 dark:text-white">
                       {editingDistrict?.id === district.id ? (
                         <input
                           type="text"
                           defaultValue={district.name}
                           id={`district-name-${district.id}`}
-                          className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                          className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         />
                       ) : (
                         district.name
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 text-gray-800 dark:text-white">
                       {editingDistrict?.id === district.id ? (
                         <input
                           type="number"
                           defaultValue={district.maxAgents || 0}
                           id={`district-max-${district.id}`}
-                          className="border border-gray-300 rounded-lg px-3 py-2 w-32 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                          className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 w-32 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         />
                       ) : (
                         district.maxAgents || 0

@@ -136,20 +136,20 @@ function SearchAgencyPage() {
     }
   };
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 transition-colors duration-300">
       <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Quản Lý Đại Lý</h1>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Quản Lý Đại Lý</h1>
       </div>
       <AgencyFilterBar
         filters={filters}
         onChange={handleFilterChange}
         onReset={handleResetFilters}
       />
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50 text-gray-600 font-semibold border-b border-gray-200">
+            <thead className="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-gray-600">
               <tr>
                 <th className="p-4 w-16">Mã</th>
                 <th className="p-4">Tên Đại Lý</th>
@@ -157,23 +157,23 @@ function SearchAgencyPage() {
                 <th className="p-4">Liên Hệ</th>
                 <th className="p-4">Địa Chỉ</th>
                 <th
-                  className="p-4 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                  className="p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors select-none"
                   onClick={handleSortToggle}
                 >
-                  <div className="flex items-center gap-1 text-cyan-700">
+                  <div className="flex items-center gap-1 text-cyan-700 dark:text-cyan-400">
                     Công Nợ
                     {filters.sort === "asc" && <FaSortUp />}
                     {filters.sort === "desc" && <FaSortDown />}
-                    {!filters.sort && <FaSort className="text-gray-300" />}
+                    {!filters.sort && <FaSort className="text-gray-300 dark:text-gray-500" />}
                   </div>
                 </th>
                 <th className="p-4 text-center">Tác vụ</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {isLoading ? (
                 <tr>
-                  <td colSpan="7" className="p-8 text-center text-gray-500">
+                  <td colSpan="7" className="p-8 text-center text-gray-500 dark:text-gray-400">
                     <div className="flex justify-center items-center gap-2">
                       <span className="animate-spin">⏳</span> Đang tải dữ
                       liệu...
@@ -192,7 +192,7 @@ function SearchAgencyPage() {
               ) : (
                 <tr>
                   <td colSpan="7" className="py-12 text-center">
-                    <div className="flex flex-col items-center justify-center text-gray-400">
+                    <div className="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                       <span className="text-4xl mb-2">🔍</span>
                       <p>Không tìm thấy kết quả nào phù hợp.</p>
                     </div>

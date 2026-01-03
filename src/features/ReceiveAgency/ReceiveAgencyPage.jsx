@@ -56,21 +56,21 @@ function ReceiveAgentPage() {
   }, []);
 
   return (
-    <div className="p-8 bg-gray-50 min-h-full">
+    <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-full transition-colors duration-300">
       <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
           Tiếp nhận đại lý mới
         </h1>
       </div>
 
       {/* Form Card */}
-      <div className="bg-white rounded-xl shadow-sm p-6 relative left-1/2 top-1/2 -translate-x-1/2">
-        <h2 className="text-lg font-semibold text-gray-800 mb-1">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 relative left-1/2 top-1/2 -translate-x-1/2">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">
           Thông tin đại lý
         </h2>
-        <p className="text-sm text-gray-500 mb-6">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
           Vui lòng nhập đầy đủ thông tin bên dưới
         </p>
 
@@ -88,14 +88,14 @@ function ReceiveAgentPage() {
 
           {/* Loại đại lý */}
           <div className="flex flex-col w-full">
-            <label className="mb-1 font-medium text-gray-700">
+            <label className="mb-1 font-medium text-gray-700 dark:text-gray-300">
               Loại đại lý
             </label>
             <select
               {...register("agentTypeId")}
-              className={`w-full p-4 rounded-xl bg-gray-100 text-gray-800
+              className={`w-full p-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white
             border transition duration-150 outline-0
-            ${errors.type ? "border-red-500" : "border-gray-300"}`}
+            ${errors.type ? "border-red-500" : "border-gray-300 dark:border-gray-600"}`}
             >
               <option value="">Chọn loại</option>
               {agentType.length > 0 && (
@@ -127,13 +127,13 @@ function ReceiveAgentPage() {
 
           {/* Quận */}
           <div className="flex flex-col w-full">
-            <label className="mb-1 font-medium text-gray-700">Quận</label>
+            <label className="mb-1 font-medium text-gray-700 dark:text-gray-300">Quận</label>
             <select
               defaultValue=""
               {...register("districtId")}
-              className={`w-full p-4 rounded-xl bg-gray-100 text-gray-800
+              className={`w-full p-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white
             border transition duration-150 outline-0
-            ${errors.districtId ? "border-red-500" : "border-gray-300"}`}
+            ${errors.districtId ? "border-red-500" : "border-gray-300 dark:border-gray-600"}`}
             >
               <option value="" disabled>
                 Chọn Quận
