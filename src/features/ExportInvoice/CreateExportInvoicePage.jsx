@@ -6,17 +6,23 @@ import Input from "../../components/Input";
 import Select from "../../components/Select";
 import agencyApi from "../../services/agencyApi";
 import productsApi from "../../services/productsApi";
-import unitsApi from "../../services/unitsApi";
+// import unitsApi from "../../services/unitsApi"; // Có thể không cần nếu load unit theo product
 import billApi from "../../services/billApi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import LoadingBar from "react-top-loading-bar";
+import agentTypeApi from "../../services/agentTypes";
 
 function CreateExportInvoicePage() {
   const [items, setItems] = useState([]);
   const [agencies, setAgencies] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [units, setUnits] = useState([]);
+
+  // State cho các dropdown phụ thuộc
+  const [availableProducts, setAvailableProducts] = useState([]);
+  const [availableUnits, setAvailableUnits] = useState([]);
+
+  const [selectedAgency, setSelectedAgency] = useState(null);
+
   const [currentItem, setCurrentItem] = useState({
     productId: "",
     productName: "",
@@ -25,23 +31,20 @@ function CreateExportInvoicePage() {
     quantity: "",
     price: "",
   });
+
   const loadingBarRef = useRef(null);
   const [itemError, setItemError] = useState("");
+
+  // 1. Chỉ load danh sách Đại lý khi vào trang
   useEffect(() => {
     const fetchMasterData = async () => {
       try {
         loadingBarRef.current?.continuousStart();
-        const [agencyRes, productRes, unitRes] = await Promise.all([
-          agencyApi.getAll(),
-          productsApi.getAll(),
-          unitsApi.getAll(),
-        ]);
-
+        const agencyRes = await agencyApi.getAll();
         setAgencies(agencyRes.data);
-        setProducts(productRes.data);
-        setUnits(unitRes.data);
       } catch (error) {
         console.error("Lỗi tải dữ liệu:", error);
+        toast.error("Không thể tải danh sách đại lý");
       } finally {
         loadingBarRef.current?.complete();
       }
@@ -60,30 +63,103 @@ function CreateExportInvoicePage() {
     shouldUnregister: false,
   });
 
-  const handleProductChange = (e) => {
+  // 2. Xử lý khi chọn Đại lý (Agent) -> Load Products
+  const handleAgencyChange = async (e) => {
     const selectedId = Number(e.target.value);
-    const product = products.find((p) => p.id === selectedId);
+    const agency = agencies.find((a) => a.id === selectedId);
 
+    setSelectedAgency(agency);
+
+    // Reset lại sản phẩm và item hiện tại khi đổi đại lý
+    setAvailableProducts([]);
+    setAvailableUnits([]);
+    setCurrentItem({
+      productId: "",
+      productName: "",
+      unitId: "",
+      unitName: "",
+      quantity: "",
+      price: "",
+    });
+
+    if (agency && agency.agentType) {
+      try {
+        loadingBarRef.current?.continuousStart();
+        // Gọi API lấy sản phẩm dựa trên loại đại lý (agentType.id)
+        // Lưu ý: Đảm bảo API trả về đúng cấu trúc (res.data hoặc res.data.products tùy BE)
+        const res = await agentTypeApi.getProductsByAgentId(
+          agency.agentType.id
+        );
+
+        console.log(res);
+        // Kiểm tra log để xem cấu trúc data trả về nếu không hiện
+        if (Array.isArray(res.data.products)) {
+          const productList = res.data.products.map((item) => item.product);
+          setAvailableProducts(productList);
+        } else {
+          setAvailableProducts([]);
+        }
+      } catch (error) {
+        console.error("Lỗi tải sản phẩm của đại lý:", error);
+        toast.error("Không thể tải danh sách sản phẩm cho đại lý này");
+        setAvailableProducts([]);
+      } finally {
+        loadingBarRef.current?.complete();
+      }
+    }
+  };
+
+  // 3. Xử lý khi chọn Sản phẩm -> Load Units
+  const handleProductChange = async (e) => {
+    const selectedId = Number(e.target.value);
+    const product = availableProducts.find((p) => p.id === selectedId);
+
+    console.log("kkk");
     if (product) {
+      // Cập nhật thông tin sản phẩm
       setCurrentItem((prev) => ({
         ...prev,
         productId: selectedId,
         productName: product.name,
         price: product.price,
+        unitId: "", // Reset unit khi đổi sản phẩm
+        unitName: "",
       }));
+
+      // Gọi API lấy đơn vị tính dựa trên Product ID
+      try {
+        loadingBarRef.current?.continuousStart();
+        const res = await productsApi.getUnitsByProductId(selectedId);
+        if (res.success && Array.isArray(res.data)) {
+          const unitList = res.data.map((item) => item.unit);
+          setAvailableUnits(unitList);
+        } else {
+          setAvailableUnits([]);
+        }
+      } catch (error) {
+        console.error("Lỗi tải đơn vị tính:", error);
+        toast.error("Không thể tải đơn vị tính của sản phẩm");
+        setAvailableUnits([]);
+      } finally {
+        loadingBarRef.current?.complete();
+      }
     } else {
+      // Nếu không chọn sản phẩm (value rỗng)
       setCurrentItem((prev) => ({
         ...prev,
         productId: "",
         productName: "",
         price: "",
+        unitId: "",
+        unitName: "",
       }));
+      setAvailableUnits([]);
     }
   };
 
   const handleUnitChange = (e) => {
     const selectedId = Number(e.target.value);
-    const unit = units.find((u) => u.id === selectedId);
+    const unit = availableUnits.find((u) => u.id === selectedId);
 
     setCurrentItem((prev) => ({
       ...prev,
@@ -118,6 +194,9 @@ function CreateExportInvoicePage() {
     };
 
     setItems([...items, newItem]);
+
+    // Reset item input nhưng giữ lại danh sách Products của đại lý đang chọn
+    // Reset Unit vì mỗi sản phẩm có unit khác nhau
     setCurrentItem({
       productId: "",
       productName: "",
@@ -126,13 +205,15 @@ function CreateExportInvoicePage() {
       quantity: "",
       price: "",
     });
+    setAvailableUnits([]); // Ẩn list unit đi chờ chọn sản phẩm mới
     setItemError("");
   };
+
   const onSubmitInvoice = async (data) => {
     try {
       loadingBarRef.current?.continuousStart();
       if (items.length === 0) {
-        alert("Phiếu xuất phải có ít nhất 1 mặt hàng");
+        toast.warning("Phiếu xuất phải có ít nhất 1 mặt hàng");
         return;
       }
       const detailsPayload = items.map((item) => ({
@@ -150,8 +231,12 @@ function CreateExportInvoicePage() {
 
       const response = await billApi.create(payload);
       toast.success(response.message || "Tạo phiếu thành công");
+
       reset();
       setItems([]);
+      setAvailableProducts([]); // Reset luôn list sản phẩm
+      setAvailableUnits([]);
+      setSelectedAgency(null);
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
       toast.error(
@@ -163,8 +248,8 @@ function CreateExportInvoicePage() {
   };
 
   const navigate = useNavigate();
-
   const totalMoney = items.reduce((sum, i) => sum + i.amount, 0);
+
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-10 font-sans">
       <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
@@ -188,7 +273,11 @@ function CreateExportInvoicePage() {
                       placeholder="-- Chọn đại lý --"
                       options={agencies}
                       error={errors.agentId}
-                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleAgencyChange(e);
+                      }}
+                      value={field.value}
                     />
                   )}
                 />
@@ -200,6 +289,7 @@ function CreateExportInvoicePage() {
                 />
               </div>
             </div>
+
             <div>
               <div className="flex justify-between items-end mb-4 border-b border-gray-100 pb-2">
                 <h2 className="text-xl font-bold text-gray-800">
@@ -221,25 +311,36 @@ function CreateExportInvoicePage() {
                   <div className="md:col-span-4">
                     <Select
                       label="Sản phẩm"
-                      placeholder="-- Chọn sản phẩm --"
-                      options={products}
+                      placeholder={
+                        availableProducts.length > 0
+                          ? "-- Chọn sản phẩm --"
+                          : "-- Vui lòng chọn đại lý trước --"
+                      }
+                      options={availableProducts}
                       value={currentItem.productId}
                       onChange={handleProductChange}
                       className="bg-white"
+                      disabled={availableProducts.length === 0}
                     />
                   </div>
 
                   <div className="md:col-span-2">
                     <Select
-                      label="ĐVT"
-                      placeholder="-- ĐVT --"
-                      options={units}
+                      label="Đơn vị tính"
+                      placeholder={
+                        availableUnits.length > 0
+                          ? "-- Chọn đơn vị --"
+                          : "-- Chọn sản phẩm trước --"
+                      }
+                      options={availableUnits}
                       value={currentItem.unitId}
                       onChange={handleUnitChange}
                       className="bg-white"
+                      disabled={availableUnits.length === 0}
                     />
                   </div>
 
+                  {/* Các phần còn lại giữ nguyên */}
                   <div className="md:col-span-2">
                     <Input
                       label="Số lượng"
@@ -279,6 +380,8 @@ function CreateExportInvoicePage() {
                 </div>
               </div>
             </div>
+
+            {/* Bảng danh sách và Footer giữ nguyên */}
             <div className="overflow-hidden rounded-xl border border-gray-100 shadow-sm">
               <table className="min-w-full divide-y divide-gray-100">
                 <thead className="bg-gray-50">
@@ -380,9 +483,7 @@ function CreateExportInvoicePage() {
                 <button
                   type="button"
                   onClick={() => navigate("/list-export")}
-                  className="w-full md:w-auto h-14 px-6 rounded-xl
-             border border-gray-300 text-gray-700 font-semibold
-             hover:bg-gray-100 transition-all mr-5"
+                  className="w-full md:w-auto h-14 px-6 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition-all mr-5"
                 >
                   Quay lại
                 </button>

@@ -20,7 +20,11 @@ const agentTypeApi = {
     delete: async (id) => {
         const url = `/api/agent-types/${id}`
         return await axiosClient.delete(url)
-    }
+    },
+    getProductsByAgentId: async (agentId)=>{
+    const url = `/api/agent-types/${agentId}/products`
+    return await axiosClient.get(url)
+  }
 };
 
 export default agentTypeApi;

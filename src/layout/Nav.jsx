@@ -11,6 +11,8 @@ import {
   faEdit,
   faUser,
   faSignOutAlt,
+  faBox,
+  faBalanceScale,
 } from '@fortawesome/free-solid-svg-icons';
 
 const navItems = [
@@ -19,6 +21,8 @@ const navItems = [
   { icon: faSearch, label: 'Tra cứu đại lý', to: '/search-agency' },
   { icon: faFileAlt, label: 'Quản lý xuất hàng', to: '/list-export' },
   { icon: faFileInvoiceDollar, label: 'Quản lý thu tiền', to: '/list-invoice' },
+  { icon: faBox, label: 'Quản lý sản phẩm', to: '/list-products' },
+  { icon: faBalanceScale, label: 'Đơn vị tính', to: '/list-units' },
   { icon: faChartPie, label: 'Báo cáo', to: '/reports' },
   { icon: faEdit, label: 'Thay đổi quy định', to: '/edit-rules' },
 ];

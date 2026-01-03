@@ -11,6 +11,9 @@ import InvoicePage from "../features/Invoice/InvoicePage";
 import CreateInvoicePage from "../features/Invoice/CreateInvoicePage";
 import ReportListPage from "../features/Report/ReportPage";
 import EditRulesPage from "../features/EditRules/EditRulesPage";
+import ProductsPage from "../features/Products/ProductsPage";
+import CreateProductPage from "../features/Products/CreateProductPage";
+import UnitsPage from "../features/Units/UnitsPage";
 import Layout from "../layout/Layout";
 
 
@@ -75,6 +78,18 @@ const routers = [
                     {
                         path: 'edit-rules',
                         element: <EditRulesPage />
+                    },
+                    {
+                        path: 'list-products',
+                        element: <ProductsPage />
+                    },
+                    {
+                        path: 'list-products/create-product',
+                        element: <CreateProductPage />
+                    },
+                    {
+                        path: 'list-units',
+                        element: <UnitsPage />
                     },
                 ]
             }

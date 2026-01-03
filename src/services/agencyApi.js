@@ -16,6 +16,14 @@ const agencyApi = {
   get: async (id)=>{
     const url = `/api/agents/${id}`
     return await axiosClient.get(url)
+  },
+  getTopRevenue: async ()=>{
+    const url = '/api/agents/top-revenue'
+    return await axiosClient.get(url)
+  },
+  getProductsByAgentId: async (agentId)=>{
+    const url = `/api/agents/${agentId}/products`
+    return await axiosClient.get(url)
   }
 };
 

@@ -12,6 +12,14 @@ const productsApi = {
   getById: async (id)=>{
     const url = `/api/products/${id}`
     return await axiosClient.get(url)
+  },
+  update: async (id, data)=>{
+    const url = `/api/products/${id}`
+    return await axiosClient.put(url, data)
+  },
+  getUnitsByProductId: async (productId)=>{
+    const url = `/api/products/${productId}/units`
+    return await axiosClient.get(url)
   }
 };
 
