@@ -4,15 +4,15 @@ const Select = forwardRef(({ label, options = [], error, placeholder, className 
   return (
     <div className="flex flex-col w-full">
       {label && (
-        <label className="mb-1 font-medium text-gray-700">{label}</label>
+        <label className="mb-1 font-medium text-gray-700 dark:text-gray-300">{label}</label>
       )}
-      
+
       <div className="relative">
         <select
           ref={ref}
-          className={`w-full p-4 pr-10 rounded-xl bg-gray-100 text-gray-800 
+          className={`w-full p-4 pr-10 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white  
             border transition duration-150 outline-0 appearance-none
-            ${error ? "border-red-500" : "border-gray-300"} 
+            ${error ? "border-red-500" : "border-gray-300 dark:border-gray-600"} 
             ${className}`}
           {...props}
         >

@@ -92,13 +92,13 @@ function CreateReceiptPage() {
     } catch {
       toast.error("Có lỗi khi lập phiếu thu");
     }
-    finally{
+    finally {
       loadingBarRef.current.complete();
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-10 font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 md:p-10 font-sans">
       <LoadingBar
         color="#06b6d4"
         ref={loadingBarRef}
@@ -106,11 +106,11 @@ function CreateReceiptPage() {
         shadow={true}
       />
       <div className="mx-auto">
-        <h1 className="mb-8 text-3xl font-bold text-gray-800 tracking-tight">
+        <h1 className="mb-8 text-3xl font-bold text-gray-800 dark:text-white tracking-tight">
           Lập phiếu thu tiền
         </h1>
 
-        <div className="rounded-3xl bg-white p-8 shadow-xl shadow-gray-200/50">
+        <div className="rounded-3xl bg-white dark:bg-gray-800 p-8">
           <form
             onSubmit={handleSubmit(onSubmit, (errors) =>
               console.log("LỖI VALIDATE:", errors)
@@ -119,7 +119,7 @@ function CreateReceiptPage() {
           >
             {/* ===== THÔNG TIN CHUNG ===== */}
             <div>
-              <h2 className="mb-6 text-xl font-bold text-gray-800 border-b border-gray-100 pb-2">
+              <h2 className="mb-6 text-xl font-bold text-gray-800 dark:text-white border-b border-gray-100 dark:border-gray-600 pb-2">
                 Thông tin phiếu thu
               </h2>
 
@@ -149,14 +149,14 @@ function CreateReceiptPage() {
 
             {/* ===== CÔNG NỢ ===== */}
             <div>
-              <h2 className="mb-4 text-xl font-bold text-gray-800 border-b border-gray-100 pb-2">
+              <h2 className="mb-4 text-xl font-bold text-gray-800 dark:text-white border-b border-gray-100 dark:border-gray-600 pb-2">
                 Công nợ đại lý
               </h2>
 
-              <div className="rounded-2xl bg-slate-50 p-6 border border-slate-100">
-                <p className="text-sm text-gray-500 mb-2">Công nợ hiện tại</p>
+              <div className="rounded-2xl bg-slate-50 dark:bg-gray-700 p-6 border border-slate-100 dark:border-gray-600">
+                <p className="text-sm text-gray-500 dark:text-gray-50 mb-2">Công nợ hiện tại</p>
 
-                <p className="text-4xl font-bold text-gray-900">
+                <p className="text-4xl font-bold text-gray-900 dark:text-white">
                   {loadingDebt
                     ? "Đang tải..."
                     : formatCurrency(debt.toLocaleString())}
@@ -167,7 +167,7 @@ function CreateReceiptPage() {
 
             {/* ===== NHẬP TIỀN THU ===== */}
             <div>
-              <h2 className="mb-4 text-xl font-bold text-gray-800 border-b border-gray-100 pb-2">
+              <h2 className="mb-4 text-xl font-bold text-gray-800 dark:text-white border-b border-gray-100 dark:border-gray-600 pb-2">
                 Số tiền thu
               </h2>
 
@@ -181,20 +181,20 @@ function CreateReceiptPage() {
 
               <p className="mt-2 text-sm text-gray-500">
                 Số tiền tối đa có thể thu:{" "}
-                <span className="font-semibold text-gray-700">
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
                   {debt.toLocaleString()} VNĐ
                 </span>
               </p>
             </div>
 
             {/* ===== ACTION ===== */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-6 border-t border-gray-100">
+            <div className="flex flex-col md:flex-row justify-end items-center gap-6 pt-6 border-t border-gray-100 dark:border-gray-600">
               <button
                 type="button"
                 onClick={() => navigate("/list-invoice")}
                 className="w-full md:w-auto h-14 px-6 rounded-xl
-                border border-gray-300 text-gray-700 font-semibold
-                hover:bg-gray-100 transition-all"
+                border border-gray-300 dark:border-gray-900 dark:bg-white text-gray-700 font-semibold
+                hover:bg-gray-100 dark:hover:bg-gray-900 dark:hover:text-white transition-all"
               >
                 Quay lại
               </button>
@@ -204,7 +204,7 @@ function CreateReceiptPage() {
                 disabled={!agentId || debt <= 0}
                 className="w-full md:w-auto h-14 px-10 rounded-xl
                 bg-cyan-500 text-white font-bold text-lg
-                hover:bg-cyan-600 shadow-lg shadow-cyan-200
+                hover:bg-cyan-600
                 transition-all transform active:scale-95
                 disabled:opacity-50 disabled:cursor-not-allowed"
               >

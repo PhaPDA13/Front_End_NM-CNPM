@@ -251,16 +251,16 @@ function CreateExportInvoicePage() {
   const totalMoney = items.reduce((sum, i) => sum + i.amount, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-10 font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 md:p-10 font-sans">
       <LoadingBar color="#06b6d4" ref={loadingBarRef} height={3} />
       <div className="mx-auto">
-        <h1 className="mb-8 text-3xl font-bold text-gray-800 tracking-tight">
+        <h1 className="mb-8 text-3xl font-bold text-gray-800 dark:text-white tracking-tight">
           Lập phiếu xuất hàng
         </h1>
-        <div className="rounded-3xl bg-white p-8 shadow-xl shadow-gray-200/50">
+        <div className="rounded-3xl bg-white dark:bg-gray-800 p-8">
           <form onSubmit={handleSubmit(onSubmitInvoice)} className="space-y-10">
             <div>
-              <h2 className="mb-6 text-xl font-bold text-gray-800 border-b border-gray-100 pb-2">
+              <h2 className="mb-6 text-xl font-bold text-gray-800 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">
                 Thông tin chung
               </h2>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -291,16 +291,16 @@ function CreateExportInvoicePage() {
             </div>
 
             <div>
-              <div className="flex justify-between items-end mb-4 border-b border-gray-100 pb-2">
+              <div className="flex justify-between items-end mb-4 border-b border-gray-100 dark:border-gray-700 pb-2">
                 <h2 className="text-xl font-bold text-gray-800">
                   Chi tiết hàng hóa
                 </h2>
-                <span className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                <span className="text-sm font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
                   {items.length} mặt hàng
                 </span>
               </div>
 
-              <div className="rounded-2xl bg-slate-50 p-6 border border-slate-100 relative">
+              <div className="rounded-2xl bg-slate-50 dark:bg-gray-800 p-6 border border-slate-100 dark:border-gray-600 relative">
                 {itemError && (
                   <div className="absolute top-2 left-6 text-red-500 text-sm font-medium">
                     * {itemError}
@@ -358,10 +358,10 @@ function CreateExportInvoicePage() {
                   </div>
                   <div className="md:col-span-3">
                     <div className="flex flex-col w-full">
-                      <label className="mb-1 font-medium text-gray-700">
+                      <label className="mb-1 font-medium text-gray-700 dark:text-gray-300">
                         Đơn giá
                       </label>
-                      <div className="w-full p-4 rounded-xl bg-gray-200 text-gray-600 border border-gray-300 cursor-not-allowed">
+                      <div className="w-full p-4 rounded-xl bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-white border border-gray-300 dark:border-gray-600 cursor-not-allowed">
                         {currentItem.price
                           ? Number(currentItem.price).toLocaleString()
                           : "0"}
@@ -372,7 +372,7 @@ function CreateExportInvoicePage() {
                     <button
                       type="button"
                       onClick={handleAddItem}
-                      className="h-[58px] w-full rounded-xl bg-black text-white font-semibold hover:bg-gray-800 transition shadow-lg shadow-gray-300/50 flex items-center justify-center"
+                      className="h-[58px] w-full rounded-xl bg-black dark:bg-white text-white dark:text-black font-semibold hover:bg-gray-800 dark:hover:bg-gray-900 dark:hover:text-white  transition flex items-center justify-center"
                     >
                       <span className="text-xl">+</span>
                     </button>
@@ -382,29 +382,29 @@ function CreateExportInvoicePage() {
             </div>
 
             {/* Bảng danh sách và Footer giữ nguyên */}
-            <div className="overflow-hidden rounded-xl border border-gray-100 shadow-sm">
-              <table className="min-w-full divide-y divide-gray-100">
-                <thead className="bg-gray-50">
+            <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-gray-600 shadow-sm">
+              <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-300">
+                <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
                       Mặt hàng
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
                       ĐVT
                     </th>
-                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                      SL
+                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                      Số lượng
                     </th>
-                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
                       Đơn giá
                     </th>
-                    <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-gray-700">
+                    <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                       Thành tiền
                     </th>
-                    <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500"></th>
+                    <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 bg-white">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-300 bg-white dark:bg-gray-800">
                   {items.length === 0 ? (
                     <tr>
                       <td
@@ -420,19 +420,19 @@ function CreateExportInvoicePage() {
                         key={idx}
                         className="group hover:bg-blue-50/50 transition-colors"
                       >
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                           {i.productName}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
+                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-white">
                           {i.unitName}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900 text-right">
+                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-white text-right">
                           {i.quantity}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900 text-right">
+                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-white text-right">
                           {i.price.toLocaleString()}
                         </td>
-                        <td className="px-6 py-4 text-sm font-bold text-gray-900 text-right">
+                        <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-white text-right">
                           {i.amount.toLocaleString()}
                         </td>
                         <td className="px-6 py-4 text-center">
@@ -468,12 +468,12 @@ function CreateExportInvoicePage() {
               </table>
             </div>
 
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-6 border-t border-gray-100">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-6 border-t border-gray-100 dark:border-gray-600">
               <div className="text-right">
-                <p className="text-sm text-gray-500 mb-1">
+                <p className="text-sm text-gray-500 dark:text-gray-300 mb-1">
                   Tổng giá trị đơn hàng
                 </p>
-                <p className="text-4xl font-bold text-gray-900">
+                <p className="text-4xl font-bold text-gray-900 dark:text-white">
                   {totalMoney.toLocaleString()}{" "}
                   <span className="text-xl text-gray-400 font-medium">VNĐ</span>
                 </p>
@@ -483,14 +483,14 @@ function CreateExportInvoicePage() {
                 <button
                   type="button"
                   onClick={() => navigate("/list-export")}
-                  className="w-full md:w-auto h-14 px-6 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition-all mr-5"
+                  className="w-full md:w-auto h-14 px-6 rounded-xl dark:bg-white border border-gray-300  text-gray-700 font-semibold hover:bg-gray-900  hover:text-white dark:hover:border-gray-900 transition-all mr-5"
                 >
                   Quay lại
                 </button>
 
                 <button
                   type="submit"
-                  className="w-full md:w-auto h-14 px-8 rounded-xl bg-cyan-500 text-white font-bold text-lg hover:bg-cyan-600 shadow-lg shadow-cyan-200 transition-all transform active:scale-95"
+                  className="w-full md:w-auto h-14 px-8 rounded-xl bg-cyan-500 text-white font-bold text-lg hover:bg-cyan-600 transition-all transform active:scale-95"
                 >
                   Hoàn tất đơn hàng
                 </button>
