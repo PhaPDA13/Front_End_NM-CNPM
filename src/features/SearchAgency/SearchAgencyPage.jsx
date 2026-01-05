@@ -155,6 +155,7 @@ function SearchAgencyPage() {
                 <th className="p-4">Tên Đại Lý</th>
                 <th className="p-4">Loại</th>
                 <th className="p-4">Liên Hệ</th>
+                <th className="p-4">Quận</th>
                 <th className="p-4">Địa Chỉ</th>
                 <th
                   className="p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors select-none"
@@ -173,7 +174,7 @@ function SearchAgencyPage() {
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {isLoading ? (
                 <tr>
-                  <td colSpan="7" className="p-8 text-center text-gray-500 dark:text-gray-400">
+                  <td colSpan="8" className="p-8 text-center text-gray-500 dark:text-gray-400">
                     <div className="flex justify-center items-center gap-2">
                       <span className="animate-spin">⏳</span> Đang tải dữ
                       liệu...
@@ -191,7 +192,7 @@ function SearchAgencyPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="py-12 text-center">
+                  <td colSpan="8" className="py-12 text-center">
                     <div className="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                       <span className="text-4xl mb-2">🔍</span>
                       <p>Không tìm thấy kết quả nào phù hợp.</p>

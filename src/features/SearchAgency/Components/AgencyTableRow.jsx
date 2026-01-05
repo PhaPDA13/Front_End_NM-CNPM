@@ -26,6 +26,7 @@ const AgencyTableRow = ({ agency, onEdit, onDelete }) => {
           {agency.agentType?.name || "N/A"}
         </span>
       </td>
+      
       <td className="p-4 text-gray-600 dark:text-gray-300">
         <div className="flex flex-col gap-0.5 text-xs">
           <span className="flex items-center gap-1">📞 {agency.phone}</span>
@@ -34,12 +35,18 @@ const AgencyTableRow = ({ agency, onEdit, onDelete }) => {
           </span>
         </div>
       </td>
+       <td className="p-4">
+        <span className="px-2.5 py-1 rounded-full text-xs font-semibold border bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800">
+          {agency.district?.name || "N/A"}
+        </span>
+      </td>
       <td
         className="p-4 text-gray-600 dark:text-gray-300 max-w-xs truncate"
         title={agency.address}
       >
         {agency.address}
       </td>
+     
       <td className="p-4 font-bold text-red-500 dark:text-red-400">
         {formatCurrency(agency.debtAmount)}
       </td>
