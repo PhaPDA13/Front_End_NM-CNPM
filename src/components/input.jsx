@@ -1,25 +1,35 @@
-import React, { forwardRef } from "react";
+import React from "react";
 
-const Input = forwardRef(({ label, error, className = "", ...props }, ref) => {
-  return (
-    <div className="flex flex-col w-full">
-      {label && (
-        <label className="mb-1 font-medium text-gray-700">{label}</label>
-      )}
-      <input
-        ref={ref}
-        className={`w-full p-4 rounded-xl bg-gray-100 text-gray-800 
-          border transition duration-150 outline-0
-          ${error ? "border-red-500" : "border-gray-300"} 
-          ${className}`}
-        {...props}
-      />
+const Input = React.forwardRef(
+  ({ label, error, id, ...props }, ref) => {
+    const inputId = id || props.name;
 
-      {error && (
-        <p className="text-red-500 text-sm mt-1">{error.message}</p>
-      )}
-    </div>
-  );
-});
+    return (
+      <div className="flex flex-col w-full">
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="mb-1 font-medium text-gray-700"
+          >
+            {label}
+          </label>
+        )}
+
+        <input
+          id={inputId}
+          ref={ref}
+          {...props}
+          className="w-full p-4 rounded-xl bg-gray-100 border border-gray-300"
+        />
+
+        {error && (
+          <p className="text-red-500 text-sm mt-1">
+            {error.message}
+          </p>
+        )}
+      </div>
+    );
+  }
+);
 
 export default Input;

@@ -8,6 +8,7 @@ import { schema } from "../schema/schemaSignUp";
 import { useDispatch} from "react-redux";
 import {userRegister } from "../authSlice";
 
+
 const SignUp = () => {
   const {
     register,

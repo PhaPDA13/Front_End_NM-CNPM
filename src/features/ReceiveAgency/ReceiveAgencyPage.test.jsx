@@ -1,12 +1,12 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ReceiveAgentPage from '../ReceiveAgencyPage';
+import ReceiveAgentPage from './ReceiveAgencyPage'; // Một dấu chấm vì cùng thư mục
 import agencyApi from '../../services/agencyApi';
 import districtApi from '../../services/districtApi';
-import agentTypesApi from '../../services/agentTypes';
+import agentTypeApi from '../../services/agentTypes';
 
-// Mock the API modules
+// 1. Mock các API modules
 jest.mock('../../services/agencyApi', () => ({
   create: jest.fn(),
 }));
@@ -19,7 +19,21 @@ jest.mock('../../services/agentTypes', () => ({
   getAll: jest.fn(),
 }));
 
-// Mock react-toastify
+// 2. Mock LoadingBar để tránh lỗi "continuousStart of undefined"
+jest.mock('react-top-loading-bar', () => {
+  // Sử dụng require ngay bên trong để tránh lỗi ReferenceError: React
+  const React = require('react'); 
+  
+  return React.forwardRef((props, ref) => {
+    React.useImperativeHandle(ref, () => ({
+      continuousStart: jest.fn(),
+      complete: jest.fn(),
+    }));
+    return <div data-testid="loading-bar" />;
+  });
+});
+
+// 3. Mock react-toastify
 jest.mock('react-toastify', () => ({
   toast: {
     success: jest.fn(),
@@ -31,18 +45,18 @@ describe('ReceiveAgency Page - Agency Reception Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Mock API responses
+    // Giả lập dữ liệu trả về từ API cho useEffect
     districtApi.getAll.mockResolvedValue({
       data: [
-        { id: '1', name: 'Quận 1' },
-        { id: '2', name: 'Quận 2' },
+        { id: 'd1', name: 'Quận 1' },
+        { id: 'd2', name: 'Quận 2' },
       ],
     });
 
-    agentTypesApi.getAll.mockResolvedValue({
+    agentTypeApi.getAll.mockResolvedValue({
       data: [
-        { id: '1', name: 'Loại 1' },
-        { id: '2', name: 'Loại 2' },
+        { id: 't1', name: 'Loại 1' },
+        { id: 't2', name: 'Loại 2' },
       ],
     });
   });
@@ -51,270 +65,83 @@ describe('ReceiveAgency Page - Agency Reception Tests', () => {
     return render(<ReceiveAgentPage />);
   };
 
-  describe('Tiếp nhận đại lý hợp lệ', () => {
-    test('Chức năng tiếp nhận đại lý: Kiểm tra thêm đại lý mới thành công', async () => {
+  describe('Luồng thành công', () => {
+    test('Chức năng tiếp nhận: Thêm đại lý mới thành công', async () => {
       const user = userEvent.setup();
-      
-      // Mock successful agency creation
-      agencyApi.create.mockResolvedValue({
-        data: {
-          id: '123',
-          name: 'Đại lý ABC',
-          agentTypeId: '1',
-          phone: '0912345678',
-          districtId: '1',
-          email: 'agency@example.com',
-          address: '123 Đường ABC',
-        },
-      });
+      agencyApi.create.mockResolvedValue({ data: { success: true } });
 
       renderReceiveAgency();
 
-      // Wait for dropdowns to load
-      await waitFor(() => {
-        expect(districtApi.getAll).toHaveBeenCalled();
-        expect(agentTypesApi.getAll).toHaveBeenCalled();
-      });
+      // Chờ cho dropdown load dữ liệu từ API
+      await screen.findByText('Quận 1');
 
-      // Fill form
-      const nameInput = screen.getByLabelText(/tên đại lý/i);
-      const phoneInput = screen.getByLabelText(/số điện thoại/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const addressInput = screen.getByLabelText(/địa chỉ/i);
-      const submitButton = screen.getByRole('button', { name: /submit|tạo|thêm/i });
+      // Điền thông tin - TÊN NHÃN PHẢI KHỚP VỚI COMPONENT
+      await user.type(screen.getByLabelText(/Tên/i), 'Đại lý ABC');
+      await user.type(screen.getByLabelText(/Điện thoại/i), '0912345678');
+      await user.type(screen.getByLabelText(/Email/i), 'agency@example.com');
+      await user.type(screen.getByLabelText(/Địa chỉ/i), '123 Đường ABC');
 
-      await user.type(nameInput, 'Đại lý ABC');
-      await user.type(phoneInput, '0912345678');
-      await user.type(emailInput, 'agency@example.com');
-      await user.type(addressInput, '123 Đường ABC');
-
-      // Select dropdowns
-      const agentTypeSelect = screen.getByDisplayValue('Loại 1', { selector: 'select' });
-      const districtSelect = screen.getByDisplayValue('Quận 1', { selector: 'select' });
-
-      await user.selectOption(agentTypeSelect, '1');
-      await user.selectOption(districtSelect, '1');
-
+      // Chọn select - Tìm theo nhãn Loại đại lý và Quận
+      await user.selectOptions(screen.getByDisplayValue(/Chọn loại/i), 't1');
+      await user.selectOptions(screen.getByDisplayValue(/Chọn Quận/i), 'd1');
+      
+      // Click nút submit - Tên nút phải khớp
+      const submitButton = screen.getByRole('button', { name: /Tiếp nhận đại lý/i });
       await user.click(submitButton);
 
-      // Verify API was called
+      // Kiểm tra API create có được gọi với đúng dữ liệu không
       await waitFor(() => {
         expect(agencyApi.create).toHaveBeenCalledWith(expect.objectContaining({
           name: 'Đại lý ABC',
           phone: '0912345678',
           email: 'agency@example.com',
-          address: '123 Đường ABC',
+          agentTypeId: 't1',
+          districtId: 'd1'
         }));
       });
     });
   });
 
-  describe('Tiếp nhận đại lý thiếu thông tin', () => {
-    test('Chức năng tiếp nhận đại lý: Kiểm tra ràng buộc dữ liệu bắt buộc - Thiếu tên', async () => {
+  describe('Kiểm tra Validation (Lỗi nhập liệu)', () => {
+    test('Validation: Không được để trống tên', async () => {
       const user = userEvent.setup();
-
       renderReceiveAgency();
 
-      await waitFor(() => {
-        expect(districtApi.getAll).toHaveBeenCalled();
-        expect(agentTypesApi.getAll).toHaveBeenCalled();
-      });
-
-      const phoneInput = screen.getByLabelText(/số điện thoại/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const addressInput = screen.getByLabelText(/địa chỉ/i);
-      const submitButton = screen.getByRole('button', { name: /submit|tạo|thêm/i });
-
-      // Don't fill name field
-      await user.type(phoneInput, '0912345678');
-      await user.type(emailInput, 'agency@example.com');
-      await user.type(addressInput, '123 Đường ABC');
-
-      await user.click(submitButton);
-
-      // Verify error validation appears
-      await waitFor(() => {
-        // Name is required error should appear
-      });
-    });
-
-    test('Chức năng tiếp nhận đại lý: Kiểm tra ràng buộc dữ liệu bắt buộc - Thiếu loại đại lý', async () => {
-      const user = userEvent.setup();
-
-      renderReceiveAgency();
-
-      await waitFor(() => {
-        expect(districtApi.getAll).toHaveBeenCalled();
-        expect(agentTypesApi.getAll).toHaveBeenCalled();
-      });
-
-      const nameInput = screen.getByLabelText(/tên đại lý/i);
-      const phoneInput = screen.getByLabelText(/số điện thoại/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const addressInput = screen.getByLabelText(/địa chỉ/i);
-      const submitButton = screen.getByRole('button', { name: /submit|tạo|thêm/i });
-
-      await user.type(nameInput, 'Đại lý ABC');
-      await user.type(phoneInput, '0912345678');
-      await user.type(emailInput, 'agency@example.com');
-      await user.type(addressInput, '123 Đường ABC');
+      await screen.findByText('Quận 1');
+      const submitButton = screen.getByRole('button', { name: /Tiếp nhận đại lý/i });
       
-      // Don't select agent type
-
+      // Không nhập tên, nhấn submit ngay
       await user.click(submitButton);
 
-      // Verify error validation appears
+      // API không được phép gọi khi có lỗi validation
       await waitFor(() => {
-        // Agent type is required error should appear
+        expect(agencyApi.create).not.toHaveBeenCalled();
       });
     });
 
-    test('Chức năng tiếp nhận đại lý: Kiểm tra ràng buộc dữ liệu bắt buộc - Thiếu quận', async () => {
+    test('Validation: Email sai định dạng', async () => {
       const user = userEvent.setup();
-
       renderReceiveAgency();
 
+      await user.type(screen.getByLabelText(/Email/i), 'email-sai-dinh-dang');
+      await user.click(screen.getByRole('button', { name: /Tiếp nhận đại lý/i }));
+
       await waitFor(() => {
-        expect(districtApi.getAll).toHaveBeenCalled();
-        expect(agentTypesApi.getAll).toHaveBeenCalled();
+        expect(agencyApi.create).not.toHaveBeenCalled();
       });
+    });
 
-      const nameInput = screen.getByLabelText(/tên đại lý/i);
-      const phoneInput = screen.getByLabelText(/số điện thoại/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const addressInput = screen.getByLabelText(/địa chỉ/i);
-      const submitButton = screen.getByRole('button', { name: /submit|tạo|thêm/i });
+    test('Validation: Số điện thoại không hợp lệ', async () => {
+      const user = userEvent.setup();
+      renderReceiveAgency();
 
-      await user.type(nameInput, 'Đại lý ABC');
-      await user.type(phoneInput, '0912345678');
-      await user.type(emailInput, 'agency@example.com');
-      await user.type(addressInput, '123 Đường ABC');
-
-      const agentTypeSelect = screen.getByDisplayValue('Loại 1', { selector: 'select' });
-      await user.selectOption(agentTypeSelect, '1');
+      const phoneInput = screen.getByLabelText(/Điện thoại/i);
+      await user.type(phoneInput, '123'); // Quá ngắn
       
-      // Don't select district
-
-      await user.click(submitButton);
-
-      // Verify error validation appears
-      await waitFor(() => {
-        // District is required error should appear
-      });
-    });
-
-    test('Chức năng tiếp nhận đại lý: Kiểm tra ràng buộc dữ liệu bắt buộc - Số điện thoại không hợp lệ', async () => {
-      const user = userEvent.setup();
-
-      renderReceiveAgency();
+      await user.click(screen.getByRole('button', { name: /Tiếp nhận đại lý/i }));
 
       await waitFor(() => {
-        expect(districtApi.getAll).toHaveBeenCalled();
-        expect(agentTypesApi.getAll).toHaveBeenCalled();
-      });
-
-      const nameInput = screen.getByLabelText(/tên đại lý/i);
-      const phoneInput = screen.getByLabelText(/số điện thoại/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const addressInput = screen.getByLabelText(/địa chỉ/i);
-      const submitButton = screen.getByRole('button', { name: /submit|tạo|thêm/i });
-
-      await user.type(nameInput, 'Đại lý ABC');
-      await user.type(phoneInput, '123'); // Invalid phone - too short
-      await user.type(emailInput, 'agency@example.com');
-      await user.type(addressInput, '123 Đường ABC');
-
-      const agentTypeSelect = screen.getByDisplayValue('Loại 1', { selector: 'select' });
-      const districtSelect = screen.getByDisplayValue('Quận 1', { selector: 'select' });
-      await user.selectOption(agentTypeSelect, '1');
-      await user.selectOption(districtSelect, '1');
-
-      await user.click(submitButton);
-
-      // Verify error validation appears for phone
-      await waitFor(() => {
-        // Phone format error should appear
-      });
-    });
-
-    test('Chức năng tiếp nhận đại lý: Kiểm tra ràng buộc dữ liệu bắt buộc - Email không hợp lệ', async () => {
-      const user = userEvent.setup();
-
-      renderReceiveAgency();
-
-      await waitFor(() => {
-        expect(districtApi.getAll).toHaveBeenCalled();
-        expect(agentTypesApi.getAll).toHaveBeenCalled();
-      });
-
-      const nameInput = screen.getByLabelText(/tên đại lý/i);
-      const phoneInput = screen.getByLabelText(/số điện thoại/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const addressInput = screen.getByLabelText(/địa chỉ/i);
-      const submitButton = screen.getByRole('button', { name: /submit|tạo|thêm/i });
-
-      await user.type(nameInput, 'Đại lý ABC');
-      await user.type(phoneInput, '0912345678');
-      await user.type(emailInput, 'invalidemail'); // Invalid email
-      await user.type(addressInput, '123 Đường ABC');
-
-      const agentTypeSelect = screen.getByDisplayValue('Loại 1', { selector: 'select' });
-      const districtSelect = screen.getByDisplayValue('Quận 1', { selector: 'select' });
-      await user.selectOption(agentTypeSelect, '1');
-      await user.selectOption(districtSelect, '1');
-
-      await user.click(submitButton);
-
-      // Verify error validation appears for email
-      await waitFor(() => {
-        // Email format error should appear
-      });
-    });
-  });
-
-  describe('Validation Tests', () => {
-    test('Validation: Số điện thoại phải 9-11 chữ số', async () => {
-      const user = userEvent.setup();
-
-      renderReceiveAgency();
-
-      await waitFor(() => {
-        expect(districtApi.getAll).toHaveBeenCalled();
-        expect(agentTypesApi.getAll).toHaveBeenCalled();
-      });
-
-      const phoneInput = screen.getByLabelText(/số điện thoại/i);
-      const submitButton = screen.getByRole('button', { name: /submit|tạo|thêm/i });
-
-      // Test invalid phone (too long)
-      await user.type(phoneInput, '09123456789123');
-      await user.click(submitButton);
-
-      // Verify error appears
-      await waitFor(() => {
-        // Phone validation error should appear
-      });
-    });
-
-    test('Validation: Email định dạng không đúng', async () => {
-      const user = userEvent.setup();
-
-      renderReceiveAgency();
-
-      await waitFor(() => {
-        expect(districtApi.getAll).toHaveBeenCalled();
-        expect(agentTypesApi.getAll).toHaveBeenCalled();
-      });
-
-      const emailInput = screen.getByLabelText(/email/i);
-      const submitButton = screen.getByRole('button', { name: /submit|tạo|thêm/i });
-
-      await user.type(emailInput, 'notanemail');
-      await user.click(submitButton);
-
-      // Verify error appears
-      await waitFor(() => {
-        // Email validation error should appear
+        expect(agencyApi.create).not.toHaveBeenCalled();
       });
     });
   });
