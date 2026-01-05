@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import receiptApi from "../../services/billApi";
+import receiptApi from "../../services/receiptApi";
 import formatCurrency from "../../helper/formatCurrenry";
 import LoadingBar from "react-top-loading-bar";
 import Pagination from "../SearchAgency/Components/Pagination";
@@ -127,10 +127,10 @@ function ReceiptInvoiceListPage() {
                       {r.agent?.name}
                     </td>
                     <td className="px-6 py-4 text-gray-700 dark:text-gray-300">
-                      {new Date(r.issueDate).toLocaleDateString()}
+                      {new Date(r.payDate).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right font-bold text-gray-900 dark:text-white">
-                      {formatCurrency(r.total.toLocaleString())}
+                      {formatCurrency(r.amount.toLocaleString())}
                     </td>
                   </tr>
                 ))
