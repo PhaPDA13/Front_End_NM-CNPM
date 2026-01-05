@@ -11,17 +11,19 @@ import agentTypeApi from "../../../services/agentTypes";
 
 const Select = ({ label, error, children, ...props }) => (
   <div className="flex flex-col w-full">
-    {label && <label className="mb-1 font-medium text-gray-700">{label}</label>}
+    {label && (
+      <label className="mb-1 font-medium text-gray-700 dark:text-gray-300">{label}</label>
+    )}
     <div className="relative">
       <select
-        className={`w-full p-4 rounded-xl bg-gray-100 text-gray-800 appearance-none
-          border transition duration-150 outline-none focus:ring-2 focus:ring-cyan-500/20
-          ${error ? "border-red-500" : "border-gray-300 hover:border-cyan-400"}`}
+        className={`w-full p-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none
+          border transition duration-150 outline-none focus:ring-2 focus:ring-cyan-500/20 dark:focus:ring-cyan-400/30
+          ${error ? "border-red-500" : "border-gray-300 dark:border-gray-600 hover:border-cyan-400 dark:hover:border-cyan-400"}`}
         {...props}
       >
         {children}
       </select>
-      <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
+      <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500 dark:text-gray-300">
         <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
           <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
         </svg>
@@ -110,21 +112,21 @@ export default function UpdateAgencyModal({ open, onClose, agency, onReload }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity">
-      <div className="bg-white rounded-3xl w-[850px] max-h-[90vh] overflow-y-auto shadow-2xl transform transition-all">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
+      <div className="bg-white dark:bg-gray-900 rounded-3xl w-[850px] max-h-[90vh] overflow-y-auto shadow-2xl transform transition-all border border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 sticky top-0 bg-white dark:bg-gray-900 z-10">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
               Cập nhật đại lý
             </h2>
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
               Chỉnh sửa thông tin chi tiết của đại lý
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
           >
-            <X className="w-6 h-6 text-gray-400 hover:text-gray-600" />
+            <X className="w-6 h-6 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white" />
           </button>
         </div>
         <div className="p-8">
@@ -161,7 +163,7 @@ export default function UpdateAgencyModal({ open, onClose, agency, onReload }) {
               placeholder="0"
               readOnly
               disabled
-              className="font-medium text-cyan-600 bg-gray-50"
+              className="font-medium text-cyan-600 dark:text-cyan-300 bg-gray-50 dark:bg-gray-800"
               {...register("debtAmount")}
             />
 
@@ -204,11 +206,11 @@ export default function UpdateAgencyModal({ open, onClose, agency, onReload }) {
               />
             </div>
 
-            <div className="md:col-span-2 flex justify-end gap-4 mt-6 pt-6 border-t border-gray-100">
+            <div className="md:col-span-2 flex justify-end gap-4 mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-8 py-3 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-all active:scale-95"
+                className="px-8 py-3 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-600 transition-all active:scale-95"
               >
                 Hủy bỏ
               </button>
