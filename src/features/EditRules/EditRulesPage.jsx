@@ -182,6 +182,7 @@ function EditRulesPage() {
   const handleUpdateProduct = async (id, formData) => {
     try {
       loadingBarRef.current?.continuousStart();
+      console.log(formData)
       await productsApi.update(id, formData);
       await loadProductsUnitsAndAgentTypes();
       setEditingProduct(null);
@@ -412,7 +413,7 @@ function EditRulesPage() {
                                 type="checkbox"
                                 defaultChecked={product.units?.some(u => u.unitId === unit.id)}
                                 value={unit.id}
-                                className="product-unit-checkbox-${product.id}"
+                                className={`product-unit-checkbox-${product.id}`}
                               />
                               <span className="text-sm">{unit.name}</span>
                             </label>

@@ -223,9 +223,12 @@ function CreateExportInvoicePage() {
         price: item.price,
       }));
 
+      // Chuyển đổi date string thành ISO format với múi giờ local
+      const issueDate = new Date(data.issueDate + 'T00:00:00').toISOString();
+
       const payload = {
         agentId: Number(data.agentId),
-        issueDate: data.issueDate,
+        issueDate: issueDate,
         details: detailsPayload,
       };
 
